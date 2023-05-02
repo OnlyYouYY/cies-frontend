@@ -85,7 +85,7 @@ const AppConfig = (props) => {
                     </div>
                     
                     <div className="col-3">
-                        <button className="p-link w-2rem h-2rem" onClick={() => changeTheme('bootstrap4-dark-blue', 'dark')}>
+                        <button className="p-link w-2rem h-2rem" onClick={() => changeTheme('lara-dark-blue', 'dark')}>
                             <img src="/layout/images/themes/darkMode2.png" className="w-2rem h-2rem" alt="Bootstrap Dark Blue" />
                         </button>
                     </div>

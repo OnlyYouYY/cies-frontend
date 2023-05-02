@@ -35,17 +35,17 @@ const AppMenu = () => {
                 { label: 'Control de calidad', icon: 'pi pi-fw pi-star-fill'},
             ]
         },
-        {
-            label: 'Facturacion',
-            items: [
-                { label: 'Registro de servicios', icon: 'pi pi-fw pi-check-square'},
-                { label: 'Gestion de pagos', icon: 'pi pi-fw pi-dollar'},
-                { label: 'Gestion de cobros', icon: 'pi pi-fw pi-money-bill'},
-                { label: 'Control de caja', icon: 'pi pi-fw pi-chart-bar'},
-                { label: 'Gestion de devoluciones', icon: 'pi pi-fw pi-trash'},
-                { label: 'Informes financieros', icon: 'pi pi-fw pi-chart-line'},
-            ]
-        },
+        // {
+        //     label: 'Facturacion',
+        //     items: [
+        //         { label: 'Registro de servicios', icon: 'pi pi-fw pi-check-square'},
+        //         { label: 'Gestion de pagos', icon: 'pi pi-fw pi-dollar'},
+        //         { label: 'Gestion de cobros', icon: 'pi pi-fw pi-money-bill'},
+        //         { label: 'Control de caja', icon: 'pi pi-fw pi-chart-bar'},
+        //         { label: 'Gestion de devoluciones', icon: 'pi pi-fw pi-trash'},
+        //         { label: 'Informes financieros', icon: 'pi pi-fw pi-chart-line'},
+        //     ]
+        // },
         {
             label: 'Administracion',
             items: [

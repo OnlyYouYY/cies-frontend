@@ -6,16 +6,21 @@ import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import '../styles/layout/layout.scss';
 import '../styles/demo/Demos.scss';
+import { ToastContainer } from 'react-toastify';
 
 export default function MyApp({ Component, pageProps }) {
     if (Component.getLayout) {
-        return <LayoutProvider>{Component.getLayout(<Component {...pageProps} />)}</LayoutProvider>;
+        return <LayoutProvider>
+            {Component.getLayout(<Component {...pageProps} />)}
+            <ToastContainer theme="colored"/>
+        </LayoutProvider>;
     } else {
         return (
             <LayoutProvider>
                 <Layout>
                     <Component {...pageProps} />
                 </Layout>
+                <ToastContainer theme="colored"/>
             </LayoutProvider>
         );
     }

@@ -1,28 +1,20 @@
-
-import { StyleClass } from 'primereact/styleclass';
-import { classNames } from 'primereact/utils';
-import { Ripple } from 'primereact/ripple';
-import { Divider } from 'primereact/divider';
 import { Button } from 'primereact/button';
-import { Chart } from 'primereact/chart';
-import { Column } from 'primereact/column';
-import { DataTable } from 'primereact/datatable';
-import { Menu } from 'primereact/menu';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { ProductService } from '../demo/service/ProductService';
-import { LayoutContext } from '../layout/context/layoutcontext';
-import Link from 'next/link';
-import Image from 'next/image';
-
+import { getSession } from '../utils/session';
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
-    const [isHidden, setIsHidden] = useState(false);
-    const { layoutConfig } = useContext(LayoutContext);
-    const menuRef = useRef();
     const logo = 'https://www.cies.org.bo/wp-content/uploads/2021/04/IMG_3867-scaled.jpg';
-    const toggleMenuItemClick = () => {
-        setIsHidden((prevState) => !prevState);
-    };
+    const session = getSession();
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            if (session == null) {
+                window.location.replace('./auth/login')
+                return null;
+            }
+        }
+    });
 
     return (
         <div className="surface-0 flex justify-content-center">
@@ -92,10 +84,12 @@ const Dashboard = () => {
 
                 </div>
 
-                
+
             </div>
         </div>
     );
 };
+
+
 
 export default Dashboard;

@@ -49,6 +49,7 @@ const AppMenu = () => {
         {
             label: 'Administracion',
             items: [
+                { label: 'Gestion de servicios', icon: 'pi pi-fw pi-briefcase', to: '/servicios'},
                 { label: 'Gestion de usuarios', icon: 'pi pi-fw pi-user-plus'},
                 { label: 'Gestion de permisos', icon: 'pi pi-fw pi-globe'},
                 { label: 'Gestion de backups', icon: 'pi pi-fw pi-database'},

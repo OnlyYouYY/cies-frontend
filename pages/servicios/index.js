@@ -249,20 +249,20 @@ const Servicios = () => {
 
     const serviceDialogFooter = (
         <>
-            <Button label="Cancel" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" text onClick={saveService} />
+            <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" text onClick={saveService} />
         </>
     );
     const deleteServiceDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteServiceDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteService} />
+            <Button label="Si" icon="pi pi-check" text onClick={deleteService} />
         </>
     );
     const deleteServicesDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteServicesDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteSelectedServices} />
+            <Button label="Si" icon="pi pi-check" text onClick={deleteSelectedServices} />
         </>
     );
 
@@ -284,9 +284,9 @@ const Servicios = () => {
                         rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} servicios"
                         globalFilter={globalFilter}
-                        emptyMessage="No products found."
+                        emptyMessage="No se encontraron servicios."
                         header={header}
                         responsiveLayout="scroll"
                     >

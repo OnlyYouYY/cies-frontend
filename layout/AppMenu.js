@@ -15,7 +15,7 @@ const AppMenu = () => {
         {
             label: 'Pacientes',
             items: [
-                //{ label: 'Registro Paciente', icon: 'pi pi-fw pi-id-card', to: '/uikit/formlayout' },
+                { label: 'Prueba Menu', icon: 'pi pi-fw pi-id-card', to: '/uikit/menu' },
                 { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus'},
                 { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open'},
                 { label: 'Citas programadas', icon: 'pi pi-fw pi-calendar'},

@@ -9,6 +9,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton } from 'primereact/radiobutton';
 import { Rating } from 'primereact/rating';
 import { Toast } from 'primereact/toast';
+import { listarCategorias } from '../../services/apiService';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
@@ -22,9 +23,10 @@ const Servicios = () => {
         precio: 0,
         categoria: null,
         fecha_creacion: '',
-        estado_servicio: 'Habilitado'
+        estado_servicio: 'Pendiente'
     };
 
+    const [categorias, setCategorias] = useState([]);
     const [services, setServices] = useState(null);
     const [serviceDialog, setServiceDialog] = useState(false);
     const [deleteServiceDialog, setDeleteServiceDialog] = useState(false);
@@ -38,6 +40,39 @@ const Servicios = () => {
 
     useEffect(() => {
         ServiceService.getServices().then((data) => setServices(data));
+    }, []);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (!username || !password) {
+            toast.warning('Por favor completa ambos campos');
+            return;
+        }
+        try {
+            const response = await login(username, password);
+            console.log(response);
+            setSession(response.token);
+            localStorage.setItem('userData', JSON.stringify(response.result[0]));
+            if (typeof window !== 'undefined') {
+                window.location.replace('../../');
+            }
+        } catch (error) {
+            toast.error('El usuario o la contraseña son incorrectos');
+        }
+    };
+    
+
+    useEffect(() => {
+        async function obtenerCategorias() {
+            try {
+                const categorias = await listarCategorias();
+                console.log(categorias);
+                setCategorias(categorias);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        obtenerCategorias();
     }, []);
 
     const formatCurrency = (value) => {
@@ -313,18 +348,18 @@ const Servicios = () => {
                         <div className="field">
                             <label className="mb-3">Categoria</label>
                             <div className="formgrid grid">
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category1" name="category" value="Terapeutico" onChange={onCategoryChange} checked={service.categoria === 'Terapeutico'} />
-                                    <label htmlFor="category1">Terapeutico</label>
-                                </div>
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category2" name="category" value="Atencion Primaria" onChange={onCategoryChange} checked={service.categoria === 'Atencion Primaria'} />
-                                    <label htmlFor="category2">Atencion Primaria</label>
-                                </div>
-                                <div className="field-radiobutton col-6">
-                                    <RadioButton inputId="category3" name="category" value="Especialidad" onChange={onCategoryChange} checked={service.categoria === 'Especialidad'} />
-                                    <label htmlFor="category3">Especialidad</label>
-                                </div>
+                                {categorias.map((categoria) => (
+                                    <div className="field-radiobutton col-6" key={categoria.id}>
+                                        <RadioButton
+                                            inputId={`category${categoria.id}`}
+                                            name="category"
+                                            value={categoria.nombre_categoria}
+                                            onChange={onCategoryChange}
+                                            checked={service.categoria === categoria.nombre_categoria}
+                                        />
+                                        <label htmlFor={`category${categoria.id}`}>{categoria.nombre_categoria}</label>
+                                    </div>
+                                ))}
                             </div>
                         </div>
 

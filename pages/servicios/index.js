@@ -7,26 +7,25 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton } from 'primereact/radiobutton';
-import { Rating } from 'primereact/rating';
 import { Toast } from 'primereact/toast';
-import { listarCategorias } from '../../services/apiService';
+import { Rating } from 'primereact/rating';
+import { listarCategorias, mostrarServicios, registrar, actualizar } from '../../services/apiService';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { ServiceService } from '../../demo/service/ServiceService';
 
 const Servicios = () => {
     let emptyService = {
-        id: null,
+        id: 0,
         nombre_servicio: '',
         descripcion_servicio: '',
         precio: 0,
-        categoria: null,
-        fecha_creacion: '',
-        estado_servicio: 'Pendiente'
+        categoria: 0
     };
 
     const [categorias, setCategorias] = useState([]);
+    const [servicios, setServicios] = useState([]);
     const [services, setServices] = useState(null);
     const [serviceDialog, setServiceDialog] = useState(false);
     const [deleteServiceDialog, setDeleteServiceDialog] = useState(false);
@@ -42,37 +41,74 @@ const Servicios = () => {
         ServiceService.getServices().then((data) => setServices(data));
     }, []);
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!username || !password) {
-            toast.warning('Por favor completa ambos campos');
-            return;
-        }
+    const cargarServicios = async () => {
         try {
-            const response = await login(username, password);
-            console.log(response);
-            setSession(response.token);
-            localStorage.setItem('userData', JSON.stringify(response.result[0]));
-            if (typeof window !== 'undefined') {
-                window.location.replace('../../');
-            }
+          const servicios = await mostrarServicios();
+          setServicios(servicios);
         } catch (error) {
-            toast.error('El usuario o la contraseña son incorrectos');
+          console.log(error);
         }
-    };
-    
+      };
+
+    async function registrarServicio() {
+        try {
+            const response = await registrar(service.nombre_servicio, service.descripcion_servicio, service.precio, service.categoria);
+            console.log(response);
+            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio creado', life: 3000 });
+            setServiceDialog(false);
+            await cargarServicios();
+            setService(emptyService);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    function onSubmit() {
+        registrarServicio();
+    }
+
+    async function actualizarServicio() {
+        try {
+            const response = await actualizar(service.id, service.nombre_servicio, service.descripcion_servicio, service.precio, service.categoria);
+            console.log(response);
+            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio actualizado', life: 3000 });
+            await cargarServicios();
+            setServiceDialog(false);
+            setService(emptyService);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    function onSubmitActualizar() {
+        actualizarServicio();
+    }
+
 
     useEffect(() => {
         async function obtenerCategorias() {
             try {
                 const categorias = await listarCategorias();
-                console.log(categorias);
                 setCategorias(categorias);
             } catch (error) {
                 console.log(error);
             }
         }
+
         obtenerCategorias();
+    }, []);
+
+    useEffect(() => {
+        async function listarServicios() {
+            try {
+                const servicios = await mostrarServicios();
+                setServicios(servicios);
+            }
+            catch (error) {
+                console.log(error);
+            }
+        }
+        listarServicios();
     }, []);
 
     const formatCurrency = (value) => {
@@ -98,31 +134,11 @@ const Servicios = () => {
         setDeleteServicesDialog(false);
     };
 
-    const saveService = () => {
-        setSubmitted(true);
-
-        if (service.nombre_servicio.trim()) {
-            let _services = [...services];
-            let _service = { ...service };
-            if (service.id) {
-                const index = findIndexById(service.id);
-
-                _services[index] = _service;
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Servicio actualizado', life: 3000 });
-            } else {
-                _service.id = createId();
-                _services.push(_service);
-                toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Servicio creado', life: 3000 });
-            }
-
-            setServices(_services);
-            setServiceDialog(false);
-            setService(emptyService);
-        }
-    };
+    
 
     const editService = (service) => {
         setService({ ...service });
+        console.log(service);
         setServiceDialog(true);
     };
 
@@ -136,7 +152,7 @@ const Servicios = () => {
         setServices(_services);
         setDeleteServiceDialog(false);
         setService(emptyService);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Servicio eliminado', life: 3000 });
+
     };
 
     const findIndexById = (id) => {
@@ -173,7 +189,7 @@ const Servicios = () => {
         setServices(_services);
         setDeleteServicesDialog(false);
         setSelectedServices(null);
-        toast.current.show({ severity: 'success', summary: 'Successful', detail: 'Servicios eliminados', life: 3000 });
+
     };
 
     const onCategoryChange = (e) => {
@@ -182,20 +198,20 @@ const Servicios = () => {
         setService(_service);
     };
 
-    const onInputChange = (e, nombre_servicio) => {
-        const val = (e.target && e.target.value) || '';
-        let _service = { ...service };
-        _service[`${nombre_servicio}`] = val;
-
-        setService(_service);
+    const onInputChange = (e) => {
+        const { name, value } = e.target;
+        setService(prevService => ({
+            ...prevService,
+            [name]: value
+        }));
     };
 
-    const onInputNumberChange = (e, nombre_servicio) => {
-        const val = e.value || 0;
-        let _service = { ...service };
-        _service[`${nombre_servicio}`] = val;
-
-        setService(_service);
+    const onInputNumberChange = (e) => {
+        const { name, value } = e.target;
+        setService(prevService => ({
+            ...prevService,
+            [name]: parseFloat(value)
+        }));
     };
 
     const leftToolbarTemplate = () => {
@@ -249,16 +265,30 @@ const Servicios = () => {
         return (
             <>
                 <span className="p-column-title">Categoria</span>
-                {rowData.categoria}
+                {rowData.nombre_categoria}
             </>
         );
     };
 
+    const estadosColor = (estadoColor) => {
+        if (estadoColor === 'Pendiente') {
+            return 'lowstock';
+        }
+        if (estadoColor === 'Habilitado') {
+            return 'instock';
+        }
+        if (estadoColor === 'Deshabilitado') {
+            return 'outofstock';
+        }
+        return estadoColor;
+    }
+
     const estadoBodyTemplate = (rowData) => {
+        const estadoColor = estadosColor(rowData.estado_servicio);
         return (
             <>
                 <span className="p-column-title">Estado</span>
-                <span className={`product-badge status-${rowData.estado_servicio.toLowerCase()}`}>{rowData.estado_servicio}</span>
+                <span className={`product-badge status-${estadoColor}`}>{rowData.estado_servicio}</span>
             </>
         );
     };
@@ -277,7 +307,7 @@ const Servicios = () => {
             <h5 className="m-0">Gestion de Servicios</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
-                <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscando..." />
+                <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
             </span>
         </div>
     );
@@ -285,7 +315,14 @@ const Servicios = () => {
     const serviceDialogFooter = (
         <>
             <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" text onClick={saveService} />
+            <Button label="Guardar" icon="pi pi-check" text onClick={onSubmit} />
+        </>
+    );
+
+    const serviceUpdateDialogFooter = (
+        <>
+            <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
+            <Button label="Guardar" icon="pi pi-check" text onClick={onSubmitActualizar} />
         </>
     );
     const deleteServiceDialogFooter = (
@@ -310,7 +347,7 @@ const Servicios = () => {
 
                     <DataTable
                         ref={dt}
-                        value={services}
+                        value={servicios}
                         selection={selectedServices}
                         onSelectionChange={(e) => setSelectedServices(e.value)}
                         dataKey="id"
@@ -337,12 +374,12 @@ const Servicios = () => {
                     <Dialog visible={serviceDialog} style={{ width: '450px' }} header="Nuevo Servicio" modal className="p-fluid" footer={serviceDialogFooter} onHide={hideDialog}>
                         <div className="field">
                             <label htmlFor="nombre_servicio">Nombre del servicio</label>
-                            <InputText id="nombre_servicio" value={service.nombre_servicio} onChange={(e) => onInputChange(e, 'nombre_servicio')} required autoFocus className={classNames({ 'p-invalid': submitted && !service.nombre_servicio })} />
+                            <InputText id="nombre_servicio" name="nombre_servicio" value={service.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !service.nombre_servicio })} />
                             {submitted && !service.nombre_servicio && <small className="p-invalid">El nombre es requerido.</small>}
                         </div>
                         <div className="field">
                             <label htmlFor="description">Descripcion</label>
-                            <InputTextarea id="descripcion_servicio" value={service.descripcion_servicio} onChange={(e) => onInputChange(e, 'descripcion_servicio')} required rows={3} cols={20} />
+                            <InputTextarea id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onChange={onInputChange} required rows={3} cols={20} />
                         </div>
 
                         <div className="field">
@@ -352,10 +389,10 @@ const Servicios = () => {
                                     <div className="field-radiobutton col-6" key={categoria.id}>
                                         <RadioButton
                                             inputId={`category${categoria.id}`}
-                                            name="category"
-                                            value={categoria.nombre_categoria}
+                                            name="categoria"
+                                            value={categoria.id}
                                             onChange={onCategoryChange}
-                                            checked={service.categoria === categoria.nombre_categoria}
+                                            checked={service.categoria === categoria.id}
                                         />
                                         <label htmlFor={`category${categoria.id}`}>{categoria.nombre_categoria}</label>
                                     </div>
@@ -366,7 +403,44 @@ const Servicios = () => {
                         <div className="formgrid grid">
                             <div className="field col">
                                 <label htmlFor="price">Precio</label>
-                                <InputNumber id="precio" value={service.precio} onValueChange={(e) => onInputNumberChange(e, 'precio')} mode="currency" currency="BOB" locale="es-BO" />
+                                <InputNumber id="precio" value={service.precio} name='precio' onValueChange={onInputNumberChange} mode="currency" currency="BOB" locale="es-BO" />
+                            </div>
+                        </div>
+                    </Dialog>
+
+                    <Dialog visible={serviceDialog} style={{ width: '450px' }} header="Actualizar Servicio" modal className="p-fluid" footer={serviceUpdateDialogFooter} onHide={hideDialog}>
+                        <div className="field">
+                            <label htmlFor="nombre_servicio">Nombre del servicio</label>
+                            <InputText id="nombre_servicio" name="nombre_servicio" value={service.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !service.nombre_servicio })} />
+                            {submitted && !service.nombre_servicio && <small className="p-invalid">El nombre es requerido.</small>}
+                        </div>
+                        <div className="field">
+                            <label htmlFor="description">Descripcion</label>
+                            <InputTextarea id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onChange={onInputChange} required rows={3} cols={20} />
+                        </div>
+
+                        <div className="field">
+                            <label className="mb-3">Categoria</label>
+                            <div className="formgrid grid">
+                                {categorias.map((categoria) => (
+                                    <div className="field-radiobutton col-6" key={categoria.id}>
+                                        <RadioButton
+                                            inputId={`category${categoria.id}`}
+                                            name="categoria"
+                                            value={categoria.id}
+                                            onChange={onCategoryChange}
+                                            checked={service.categoria === categoria.id}
+                                        />
+                                        <label htmlFor={`category${categoria.id}`}>{categoria.nombre_categoria}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="formgrid grid">
+                            <div className="field col">
+                                <label htmlFor="price">Precio</label>
+                                <InputNumber id="precio" value={service.precio} name='precio' onValueChange={onInputNumberChange} mode="currency" currency="BOB" locale="es-BO" />
                             </div>
                         </div>
                     </Dialog>

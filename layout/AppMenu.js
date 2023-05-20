@@ -16,7 +16,7 @@ const AppMenu = () => {
         {
             label: 'Pacientes',
             items: [
-                { label: 'Prueba Menu', icon: 'pi pi-fw pi-id-card', to: '/uikit/menu' },
+                { label: 'Prueba Menu', icon: 'pi pi-fw pi-id-card', to: '/uikit/input' },
                 { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus' },
                 { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open' },
                 { label: 'Citas programadas', icon: 'pi pi-fw pi-calendar' },
@@ -55,7 +55,7 @@ const AppMenu = () => {
                     icon: 'pi pi-fw pi-briefcase',
                     items: [
                         { label: 'Nuevo servicio', icon: 'pi pi-fw pi-plus', to: '/servicios/nuevoServicio' },
-                        { label: 'Actualizar servicio', icon: 'pi pi-fw pi-pencil', to: '/servicios/actualizarServicio' },
+                        { label: 'Actualizar servicio', icon: 'pi pi-fw pi-pencil', to: '/servicios' },
                         { label: 'Listar servicios', icon: 'pi pi-fw pi-list', to: '/servicios' }
                     ]
                 },

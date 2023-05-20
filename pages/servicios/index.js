@@ -38,9 +38,6 @@ const Servicios = () => {
     const toast = useRef(null);
     const dt = useRef(null);
 
-    useEffect(() => {
-        ServiceService.getServices().then((data) => setServices(data));
-    }, []);
 
     const cargarServicios = async () => {
         try {
@@ -134,7 +131,6 @@ const Servicios = () => {
                 console.log(error);
             }
         }
-
         obtenerCategorias();
     }, []);
 
@@ -188,26 +184,7 @@ const Servicios = () => {
         setDeleteServiceDialog(true);
     };
 
-    const findIndexById = (id) => {
-        let index = -1;
-        for (let i = 0; i < services.length; i++) {
-            if (services[i].id === id) {
-                index = i;
-                break;
-            }
-        }
 
-        return index;
-    };
-
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    };
 
     const exportCSV = () => {
         dt.current.exportCSV();
@@ -217,13 +194,6 @@ const Servicios = () => {
         setDeleteServicesDialog(true);
     };
 
-    const deleteSelectedServices = () => {
-        let _services = services.filter((val) => !selectedServices.includes(val));
-        setServices(_services);
-        setDeleteServicesDialog(false);
-        setSelectedServices(null);
-
-    };
 
     const onCategoryChange = (e) => {
         let _service = { ...service };
@@ -261,7 +231,7 @@ const Servicios = () => {
         return (
             <React.Fragment>
                 <div className="my-2">
-                    <Button label="Nuevo" icon="pi pi-plus" severity="sucess" className="mr-2" onClick={openNew} />
+                    <Button label="Nuevo" icon="pi pi-plus" severity="info" className="mr-2" onClick={openNew} />
                     <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
                 </div>
             </React.Fragment>
@@ -431,13 +401,12 @@ const Servicios = () => {
                                 {categorias.map((categoria) => (
                                     <div className="field-radiobutton col-6" key={categoria.id}>
                                         <RadioButton
-                                            inputId={`category${categoria.id}`}
                                             name="categoria"
                                             value={categoria.id}
                                             onChange={onCategoryChange}
                                             checked={service.categoria === categoria.id}
                                         />
-                                        <label htmlFor={`category${categoria.id}`}>{categoria.nombre_categoria}</label>
+                                        <label>{categoria.nombre_categoria}</label>
                                     </div>
                                 ))}
                             </div>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
+const BASE_URL = 'http://localhost:4000/api';
 
 export async function registrar(nombre_servicio, descripcion_servicio, precio, id_categoria) {
     try {
@@ -21,6 +21,26 @@ export async function actualizar(id, nombre_servicio, descripcion_servicio, prec
         throw error;
     }
 
+}
+
+export async function eliminar(id){
+    try {
+        const response = await axios.put(`${BASE_URL}/servicios/eliminar/${id}`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+export async function eliminarVarios(ids){
+    try {
+        const response = await axios.put(`${BASE_URL}/servicios/eliminarServicios`,{ids});
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
 }
 
 export async function listarCategorias(){

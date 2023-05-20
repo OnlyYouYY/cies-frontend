@@ -7,6 +7,7 @@ import Link from 'next/link';
 const AppMenu = () => {
     const { layoutConfig } = useContext(LayoutContext);
 
+
     const model = [
         {
             label: 'Home',
@@ -16,23 +17,23 @@ const AppMenu = () => {
             label: 'Pacientes',
             items: [
                 { label: 'Prueba Menu', icon: 'pi pi-fw pi-id-card', to: '/uikit/menu' },
-                { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus'},
-                { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open'},
-                { label: 'Citas programadas', icon: 'pi pi-fw pi-calendar'},
-                { label: 'Consulta medica', icon: 'pi pi-fw pi-heart'},
-                { label: 'Pagos', icon: 'pi pi-fw pi-chart-line'},
-                { label: 'Administracion de medicamentos', icon: 'pi pi-fw pi-list'},
+                { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus' },
+                { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open' },
+                { label: 'Citas programadas', icon: 'pi pi-fw pi-calendar' },
+                { label: 'Consulta medica', icon: 'pi pi-fw pi-heart' },
+                { label: 'Pagos', icon: 'pi pi-fw pi-chart-line' },
+                { label: 'Administracion de medicamentos', icon: 'pi pi-fw pi-list' },
                 { label: 'Informes', icon: 'pi pi-fw pi-file-o' }
             ]
         },
         {
             label: 'Farmacia',
             items: [
-                { label: 'Gestion de inventario', icon: 'pi pi-fw pi-book'},
-                { label: 'Gestion de pedidos', icon: 'pi pi-fw pi-shopping-cart'},
-                { label: 'Dispensacion de medicamentos', icon: 'pi pi-fw pi-heart'},
-                { label: 'Control de stock', icon: 'pi pi-fw pi-list'},
-                { label: 'Control de calidad', icon: 'pi pi-fw pi-star-fill'},
+                { label: 'Gestion de inventario', icon: 'pi pi-fw pi-book' },
+                { label: 'Gestion de pedidos', icon: 'pi pi-fw pi-shopping-cart' },
+                { label: 'Dispensacion de medicamentos', icon: 'pi pi-fw pi-heart' },
+                { label: 'Control de stock', icon: 'pi pi-fw pi-list' },
+                { label: 'Control de calidad', icon: 'pi pi-fw pi-star-fill' },
             ]
         },
         // {
@@ -47,16 +48,25 @@ const AppMenu = () => {
         //     ]
         // },
         {
-            label: 'Administracion',
+            label: 'Administración',
             items: [
-                { label: 'Gestion de servicios', icon: 'pi pi-fw pi-briefcase', to: '/servicios'},
-                { label: 'Gestion de usuarios', icon: 'pi pi-fw pi-user-plus'},
-                { label: 'Gestion de permisos', icon: 'pi pi-fw pi-globe'},
-                { label: 'Gestion de backups', icon: 'pi pi-fw pi-database'},
-                { label: 'Monitoreo del sistema', icon: 'pi pi-fw pi-desktop'},
-                { label: 'Generacion de informes', icon: 'pi pi-fw pi-file-excel'},
-                { label: 'Configuracion del sistema', icon: 'pi pi-fw pi-cog'},
+                {
+                    label: 'Gestión de servicios',
+                    icon: 'pi pi-fw pi-briefcase',
+                    items: [
+                        { label: 'Nuevo servicio', icon: 'pi pi-fw pi-plus', to: '/servicios/nuevoServicio' },
+                        { label: 'Actualizar servicio', icon: 'pi pi-fw pi-pencil', to: '/servicios/actualizarServicio' },
+                        { label: 'Listar servicios', icon: 'pi pi-fw pi-list', to: '/servicios' }
+                    ]
+                },
+                { label: 'Gestión de usuarios', icon: 'pi pi-fw pi-user-plus' },
+                { label: 'Gestión de permisos', icon: 'pi pi-fw pi-globe' },
+                { label: 'Gestión de backups', icon: 'pi pi-fw pi-database' },
+                { label: 'Monitoreo del sistema', icon: 'pi pi-fw pi-desktop' },
+                { label: 'Generación de informes', icon: 'pi pi-fw pi-file-excel' },
+                { label: 'Configuración del sistema', icon: 'pi pi-fw pi-cog' }
             ]
+
         }
     ];
 

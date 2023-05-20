@@ -9,7 +9,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton } from 'primereact/radiobutton';
 import { Toast } from 'primereact/toast';
 import { Rating } from 'primereact/rating';
-import { listarCategorias, mostrarServicios, registrar, actualizar } from '../../services/apiService';
+import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, eliminarVarios } from '../../services/apiService';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { use, useEffect, useRef, useState } from 'react';
@@ -28,6 +28,7 @@ const Servicios = () => {
     const [servicios, setServicios] = useState([]);
     const [services, setServices] = useState(null);
     const [serviceDialog, setServiceDialog] = useState(false);
+    const [serviceUpdateDialog, setServiceUpdateDialog] = useState(false);
     const [deleteServiceDialog, setDeleteServiceDialog] = useState(false);
     const [deleteServicesDialog, setDeleteServicesDialog] = useState(false);
     const [service, setService] = useState(emptyService);
@@ -43,12 +44,12 @@ const Servicios = () => {
 
     const cargarServicios = async () => {
         try {
-          const servicios = await mostrarServicios();
-          setServicios(servicios);
+            const servicios = await mostrarServicios();
+            setServicios(servicios);
         } catch (error) {
-          console.log(error);
+            console.log(error);
         }
-      };
+    };
 
     async function registrarServicio() {
         try {
@@ -69,11 +70,11 @@ const Servicios = () => {
 
     async function actualizarServicio() {
         try {
-            const response = await actualizar(service.id, service.nombre_servicio, service.descripcion_servicio, service.precio, service.categoria);
+            const response = await actualizar(service.id, service.nombre_servicio, service.descripcion_servicio, service.precio, service.id_categoria);
             console.log(response);
             toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio actualizado', life: 3000 });
             await cargarServicios();
-            setServiceDialog(false);
+            setServiceUpdateDialog(false);
             setService(emptyService);
         } catch (error) {
             console.log(error);
@@ -82,6 +83,45 @@ const Servicios = () => {
 
     function onSubmitActualizar() {
         actualizarServicio();
+    }
+
+    const collectSelectedIds = (selectedItems) => {
+        const selectedIds = selectedItems.map((item) => item.id);
+        return selectedIds;
+    };
+
+    async function eliminarServicio() {
+        try {
+
+            const response = await eliminar(service.id);
+            console.log(response);
+            toast.current.show({ severity: 'error', summary: 'Exitoso', detail: 'Servicio eliminado', life: 3000 });
+            await cargarServicios();
+            setDeleteServiceDialog(false);
+            setService(emptyService);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    async function eliminarServicios() {
+        try {
+            if (selectedServices) {
+                const selectedIds = collectSelectedIds(selectedServices);
+                console.log(selectedIds);
+                const response = await eliminarVarios(selectedIds);
+                console.log(response);
+                toast.current.show({ severity: 'error', summary: 'Exitoso', detail: 'Servicios eliminados', life: 3000 });
+                await cargarServicios();
+                setDeleteServicesDialog(false);
+                setSelectedServices(null);
+            }
+
+        }
+        catch (error) {
+            throw error;
+        }
     }
 
 
@@ -124,6 +164,7 @@ const Servicios = () => {
     const hideDialog = () => {
         setSubmitted(false);
         setServiceDialog(false);
+        setServiceUpdateDialog(false);
     };
 
     const hideDeleteServiceDialog = () => {
@@ -134,25 +175,17 @@ const Servicios = () => {
         setDeleteServicesDialog(false);
     };
 
-    
+
 
     const editService = (service) => {
         setService({ ...service });
         console.log(service);
-        setServiceDialog(true);
+        setServiceUpdateDialog(true);
     };
 
     const confirmDeleteService = (service) => {
         setService(service);
         setDeleteServiceDialog(true);
-    };
-
-    const deleteService = () => {
-        let _services = services.filter((val) => val.id !== service.id);
-        setServices(_services);
-        setDeleteServiceDialog(false);
-        setService(emptyService);
-
     };
 
     const findIndexById = (id) => {
@@ -197,6 +230,16 @@ const Servicios = () => {
         _service['categoria'] = e.value;
         setService(_service);
     };
+
+    function onCategoryChangeUpdate(categoriaId) {
+        setService(prevService => {
+            if (prevService.id_categoria === categoriaId) {
+                return { ...prevService, id_categoria: null };
+            } else {
+                return { ...prevService, id_categoria: categoriaId };
+            }
+        });
+    }
 
     const onInputChange = (e) => {
         const { name, value } = e.target;
@@ -328,13 +371,13 @@ const Servicios = () => {
     const deleteServiceDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteServiceDialog} />
-            <Button label="Si" icon="pi pi-check" text onClick={deleteService} />
+            <Button label="Si" icon="pi pi-check" text onClick={eliminarServicio} />
         </>
     );
     const deleteServicesDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteServicesDialog} />
-            <Button label="Si" icon="pi pi-check" text onClick={deleteSelectedServices} />
+            <Button label="Si" icon="pi pi-check" text onClick={eliminarServicios} />
         </>
     );
 
@@ -408,7 +451,7 @@ const Servicios = () => {
                         </div>
                     </Dialog>
 
-                    <Dialog visible={serviceDialog} style={{ width: '450px' }} header="Actualizar Servicio" modal className="p-fluid" footer={serviceUpdateDialogFooter} onHide={hideDialog}>
+                    <Dialog visible={serviceUpdateDialog} style={{ width: '450px' }} header="Actualizar Servicio" modal className="p-fluid" footer={serviceUpdateDialogFooter} onHide={hideDialog}>
                         <div className="field">
                             <label htmlFor="nombre_servicio">Nombre del servicio</label>
                             <InputText id="nombre_servicio" name="nombre_servicio" value={service.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !service.nombre_servicio })} />
@@ -428,8 +471,10 @@ const Servicios = () => {
                                             inputId={`category${categoria.id}`}
                                             name="categoria"
                                             value={categoria.id}
-                                            onChange={onCategoryChange}
-                                            checked={service.categoria === categoria.id}
+                                            onChange={() => onCategoryChangeUpdate(categoria.id)}
+                                            checked={service.id_categoria === categoria.id}
+
+
                                         />
                                         <label htmlFor={`category${categoria.id}`}>{categoria.nombre_categoria}</label>
                                     </div>

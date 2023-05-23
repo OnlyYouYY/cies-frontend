@@ -4,6 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { FileUpload } from 'primereact/fileupload';
 import { InputNumber } from 'primereact/inputnumber';
+import { Image } from 'primereact/image';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton } from 'primereact/radiobutton';
@@ -21,7 +22,7 @@ const Servicios = () => {
         nombre_servicio: '',
         descripcion_servicio: '',
         precio: 0,
-        categoria: 0
+        ruta_imagen: ''
     };
 
     const [categorias, setCategorias] = useState([]);
@@ -448,6 +449,13 @@ const Servicios = () => {
                                         <label htmlFor={`category${categoria.id}`}>{categoria.nombre_categoria}</label>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        <div className="card">
+                            <h5>Imagen servicio</h5>
+                            <div className="flex justify-content-center">
+                                <Image id="ruta_imagen" name="ruta_imagen" src={`${service.ruta_imagen}`} alt="galleria" width={250} preview />
                             </div>
                         </div>
 

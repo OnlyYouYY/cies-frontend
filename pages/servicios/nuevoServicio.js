@@ -6,75 +6,141 @@ import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
 import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
+import { Splitter, SplitterPanel } from 'primereact/splitter';
+import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, eliminarVarios } from '../../services/apiService';
 
-export const InputDemo = () => {
+export const NuevoServicio = () => {
 
-    const toast = useRef(null);
-    const [listboxValue, setListboxValue] = useState(null);
-    const [selectedFile, setSelectedFile] = useState(null);
-
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-        setSelectedFile(URL.createObjectURL(file));
+    let emptyService = {
+        nombre_servicio: '',
+        descripcion_servicio: '',
+        precio: 0,
     };
 
-    const listboxValues = [
-        { name: 'New York', code: 'NY' },
-        { name: 'Rome', code: 'RM' },
-        { name: 'London', code: 'LDN' },
-        { name: 'Istanbul', code: 'IST' },
-        { name: 'Paris', code: 'PRS' }
-    ];
-    
+    const toast = useRef(null);
+    const [categorias, setCategorias] = useState([]);
+    const [servicio, setServicio] = useState(emptyService);
+    const [listboxValue, setListboxValue] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    //Registrar Servicio
+    async function registrarServicio() {
+        if (selectedImage) {
+            try {
+                const response = await registrar(servicio.nombre_servicio, servicio.descripcion_servicio, servicio.precio, listboxValue.id, selectedImage);
+                console.log(response);
+                toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio creado', life: 3000 });
+                setServicio(emptyService);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+    }
+
+    //Cargar categorias
+    useEffect(() => {
+        async function obtenerCategorias() {
+            try {
+                const categorias = await listarCategorias();
+                setCategorias(categorias);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        obtenerCategorias();
+    }, []);
+
+    const handleFileUpload = (event) => {
+        const file = event.files[0];
+        setSelectedImage(file);
+        console.log(file);
+        toast.current.show({ severity: 'success', summary: 'Exito', detail: 'Imagen Confirmada', life: 3000 })
+    };
+
+    const handleSubmit = async () => {
+        console.log(servicio);
+        registrarServicio();
+    };
+
+    const onInputChange = (e) => {
+        const { name, value } = e.target;
+        setServicio(prevService => ({
+            ...prevService,
+            [name]: value
+        }));
+    };
+
+    const onInputNumberChange = (e) => {
+        const { name, value } = e.target;
+        setServicio(prevService => ({
+            ...prevService,
+            [name]: parseFloat(value)
+        }));
+    };
+
 
     return (
-        <div className="grid p-fluid">
+        <div className="grid">
             <Toast ref={toast}></Toast>
             <div className="col-12 md:col-12">
-                <div className="card">
+                <div className="card p-fluid">
+                    
                     <h5>Nuevo Servicio</h5>
                     <div className="field">
                         <label htmlFor="nombreServicio">Nombre del servicio</label>
-                        <InputText id="nombre_servicio" name="nombre_servicio" required autoFocus />
+                        <InputText id="nombre_servicio" name="nombre_servicio" value={servicio.nombre_servicio} onChange={onInputChange} required autoFocus />
 
                     </div>
                     <div className="field">
                         <label htmlFor="descripcion">Descripcion</label>
-                        <InputTextarea id="descripcion_servicio" name="descripcion_servicio" required rows={3} cols={20} />
+                        <InputTextarea id="descripcion_servicio" name="descripcion_servicio" onChange={onInputChange} value={servicio.descripcion_servicio} required rows={3} cols={20} />
                     </div>
 
                     <div className="field">
                         <label htmlFor="precio">Precio</label>
-                        <InputNumber id="precio" name='precio' mode="currency" currency="BOB" locale="es-BO" />
+                        <InputNumber id="precio" value={servicio.precio} name='precio' onValueChange={onInputNumberChange} mode="currency" currency="BOB" locale="es-BO" />
                     </div>
                     <div className="field">
                         <label htmlFor="categoria">Categoria</label>
-                        <ListBox value={listboxValue} onChange={(e) => setListboxValue(e.value)} options={listboxValues} optionLabel="name" filter />
+                        <ListBox value={listboxValue} onChange={(e) => setListboxValue(e.value)} filterPlaceholder='Buscar categoria' options={categorias} optionLabel="nombre_categoria" filter />
                     </div>
                     <div className="field">
                         <label htmlFor="imagen">Imagen</label>
                         <FileUpload
                             name="demo"
                             chooseLabel="Seleccionar"
-                            uploadLabel="Subir"
-                            cancelLabel="Cancelar"
+                            uploadLabel="Confirmar"
+                            cancelLabel='Cancelar'
+                            multiple
                             className="custom-fileupload"
+                            emptyTemplate="Arrastre y suelte una imagen aquí o suba una imagen."
                             customUpload
-                            emptyTemplate="Arrastre y suelte una imagen aqui"
-                            onUpload={handleFileUpload}
+                            uploadHandler={handleFileUpload}
                         />
+
                     </div>
-                    <div className="field col-6">
+                    <div className="field">
                         <label htmlFor="imagen">Opciones</label>
                         <span className="p-buttonset flex">
-                            <Button label="Guardar" icon="pi pi-check" />
-                            <Button label="Limpiar" icon="pi pi-times" />
+                            <Button
+                                label="Guardar"
+                                icon="pi pi-check"
+                                onClick={handleSubmit}
+                                disabled={!selectedImage || !setServicio}
+                            />
+                            <Button label="Limpiar" icon="pi pi-times" onClick={() => {
+                                setServicio(emptyService);
+                                setListboxValue(null);
+                                setSelectedImage(null);
+                            }} />
                         </span>
                     </div>
+
                 </div>
             </div>
         </div>
     );
 };
 
-export default InputDemo;
+export default NuevoServicio;

@@ -232,7 +232,7 @@ const Servicios = () => {
         return (
             <React.Fragment>
                 <div className="my-2">
-                    <Button label="Nuevo" icon="pi pi-plus" severity="info" className="mr-2" onClick={openNew} />
+
                     <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
                 </div>
             </React.Fragment>
@@ -319,6 +319,7 @@ const Servicios = () => {
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Gestion de Servicios</h5>
+            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -357,7 +358,7 @@ const Servicios = () => {
             <div className="col-12">
                 <div className="card">
                     <Toast ref={toast} />
-                    <Toolbar className="mb-4" left={leftToolbarTemplate} right={rightToolbarTemplate}></Toolbar>
+                    {/* <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar> */}
 
                     <DataTable
                         ref={dt}
@@ -384,6 +385,7 @@ const Servicios = () => {
                         <Column field="inventoryStatus" header="Estado" body={estadoBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
+
 
                     <Dialog visible={serviceDialog} style={{ width: '450px' }} header="Nuevo Servicio" modal className="p-fluid" footer={serviceDialogFooter} onHide={hideDialog}>
                         <div className="field">

@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { InputNumber } from 'primereact/inputnumber';
 import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
-import { Splitter, SplitterPanel } from 'primereact/splitter';
+import { classNames } from 'primereact/utils';
 import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, eliminarVarios } from '../../services/apiService';
 
 export const NuevoServicio = () => {
@@ -18,22 +18,32 @@ export const NuevoServicio = () => {
     };
 
     const toast = useRef(null);
+    const fileUploadRef = useRef(null);
     const [categorias, setCategorias] = useState([]);
     const [servicio, setServicio] = useState(emptyService);
     const [listboxValue, setListboxValue] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [submitted, setSubmitted] = useState(false);
 
     //Registrar Servicio
     async function registrarServicio() {
-        if (selectedImage) {
+        if (servicio.nombre_servicio.trim() !== "" &&
+            servicio.descripcion_servicio.trim() !== "" &&
+            servicio.precio > 0 &&
+            listboxValue.id != null &&
+            selectedImage) {
             try {
                 const response = await registrar(servicio.nombre_servicio, servicio.descripcion_servicio, servicio.precio, listboxValue.id, selectedImage);
                 console.log(response);
                 toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio creado', life: 3000 });
                 setServicio(emptyService);
+                fileUploadRef.current.clear();
+                setListboxValue(null);
             } catch (error) {
                 console.log(error);
             }
+        } else {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Complete todos los campos', life: 3000 });
         }
 
     }
@@ -85,11 +95,12 @@ export const NuevoServicio = () => {
             <Toast ref={toast}></Toast>
             <div className="col-12 md:col-12">
                 <div className="card p-fluid">
-                    
+
                     <h5>Nuevo Servicio</h5>
                     <div className="field">
                         <label htmlFor="nombreServicio">Nombre del servicio</label>
-                        <InputText id="nombre_servicio" name="nombre_servicio" value={servicio.nombre_servicio} onChange={onInputChange} required autoFocus />
+                        <InputText id="nombre_servicio" name="nombre_servicio" value={servicio.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !servicio.nombre_servicio })} />
+                        {submitted && !servicio.nombre_servicio && <small className="p-invalid">El nombre es requerido.</small>}
 
                     </div>
                     <div className="field">
@@ -108,11 +119,12 @@ export const NuevoServicio = () => {
                     <div className="field">
                         <label htmlFor="imagen">Imagen</label>
                         <FileUpload
+                            ref={fileUploadRef}
                             name="demo"
                             chooseLabel="Seleccionar"
                             uploadLabel="Confirmar"
                             cancelLabel='Cancelar'
-                            multiple
+                            multiple={false}
                             className="custom-fileupload"
                             emptyTemplate="Arrastre y suelte una imagen aquí o suba una imagen."
                             customUpload

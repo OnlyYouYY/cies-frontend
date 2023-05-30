@@ -9,6 +9,7 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton } from 'primereact/radiobutton';
 import { Toast } from 'primereact/toast';
+import { Editor } from 'primereact/editor';
 import { Rating } from 'primereact/rating';
 import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, eliminarVarios } from '../../services/apiService';
 import { Toolbar } from 'primereact/toolbar';
@@ -49,26 +50,10 @@ const Servicios = () => {
         }
     };
 
-    async function registrarServicio() {
-        try {
-            const response = await registrar(service.nombre_servicio, service.descripcion_servicio, service.precio, service.categoria);
-            console.log(response);
-            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio creado', life: 3000 });
-            setServiceDialog(false);
-            await cargarServicios();
-            setService(emptyService);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    function onSubmit() {
-        registrarServicio();
-    }
 
     async function actualizarServicio() {
         try {
-            const response = await actualizar(service.id, service.nombre_servicio, service.descripcion_servicio, service.precio, service.id_categoria);
+            const response = await actualizar(service.id, service.nombre_servicio, service.descripcion_servicio, service.id_categoria);
             console.log(response);
             toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio actualizado', life: 3000 });
             await cargarServicios();
@@ -93,7 +78,7 @@ const Servicios = () => {
 
             const response = await eliminar(service.id);
             console.log(response);
-            toast.current.show({ severity: 'error', summary: 'Exitoso', detail: 'Servicio eliminado', life: 3000 });
+            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio eliminado', life: 3000 });
             await cargarServicios();
             setDeleteServiceDialog(false);
             setService(emptyService);
@@ -110,7 +95,7 @@ const Servicios = () => {
                 console.log(selectedIds);
                 const response = await eliminarVarios(selectedIds);
                 console.log(response);
-                toast.current.show({ severity: 'error', summary: 'Exitoso', detail: 'Servicios eliminados', life: 3000 });
+                toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicios eliminados', life: 3000 });
                 await cargarServicios();
                 setDeleteServicesDialog(false);
                 setSelectedServices(null);
@@ -139,6 +124,7 @@ const Servicios = () => {
         async function listarServicios() {
             try {
                 const servicios = await mostrarServicios();
+                console.log(servicios);
                 setServicios(servicios);
             }
             catch (error) {
@@ -148,15 +134,33 @@ const Servicios = () => {
         listarServicios();
     }, []);
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('es-BO', { style: 'currency', currency: 'BOB' });
+    // const formatCurrency = (value) => {
+    //     return value.toLocaleString('es-BO', { style: 'currency', currency: 'BOB' });
+    // };
+
+    const renderHeader = () => {
+        return (
+            <span className="ql-formats">
+                <button className="ql-bold" aria-label="Bold"></button>
+                <button className="ql-italic" aria-label="Italic"></button>
+                <button className="ql-underline" aria-label="Underline"></button>
+            </span>
+        );
     };
 
-    const openNew = () => {
-        setService(emptyService);
-        setSubmitted(false);
-        setServiceDialog(true);
-    };
+    const headerEditor = renderHeader();
+
+    function formatDate(dateString) {
+        let date = new Date(dateString);
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+    
+        month = month < 10 ? '0' + month : month;
+        day = day < 10 ? '0' + day : day;
+    
+        return `${year}-${month}-${day}`;
+    }
 
     const hideDialog = () => {
         setSubmitted(false);
@@ -173,7 +177,6 @@ const Servicios = () => {
     };
 
 
-
     const editService = (service) => {
         setService({ ...service });
         console.log(service);
@@ -186,21 +189,10 @@ const Servicios = () => {
     };
 
 
-
-    const exportCSV = () => {
-        dt.current.exportCSV();
-    };
-
     const confirmDeleteSelected = () => {
         setDeleteServicesDialog(true);
     };
 
-
-    const onCategoryChange = (e) => {
-        let _service = { ...service };
-        _service['categoria'] = e.value;
-        setService(_service);
-    };
 
     function onCategoryChangeUpdate(categoriaId) {
         setService(prevService => {
@@ -228,31 +220,13 @@ const Servicios = () => {
         }));
     };
 
-    const leftToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                <div className="my-2">
-
-                    <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
-                </div>
-            </React.Fragment>
-        );
-    };
-
-    const rightToolbarTemplate = () => {
-        return (
-            <React.Fragment>
-                <FileUpload mode="basic" accept="image/*" maxFileSize={1000000} label="Importar" chooseLabel="Importar" className="mr-2 inline-block" />
-                <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={exportCSV} />
-            </React.Fragment>
-        );
-    };
+    
 
     const idBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">ID</span>
-                {rowData.id}
+                <span className="p-column-title">Codigo</span>
+                {rowData.codigo}
             </>
         );
     };
@@ -266,14 +240,7 @@ const Servicios = () => {
         );
     };
 
-    const precioBodyTemplate = (rowData) => {
-        return (
-            <>
-                <span className="p-column-title">Precio</span>
-                {formatCurrency(rowData.precio)}
-            </>
-        );
-    };
+    
 
     const categoriaBodyTemplate = (rowData) => {
         return (
@@ -282,6 +249,10 @@ const Servicios = () => {
                 {rowData.nombre_categoria}
             </>
         );
+    };
+
+    const fechaBodyTemplate = (rowData) => {
+        return formatDate(rowData.fecha_creacion);
     };
 
     const estadosColor = (estadoColor) => {
@@ -319,7 +290,7 @@ const Servicios = () => {
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Gestion de Servicios</h5>
-            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
+            <Button label="Dar de baja" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -327,12 +298,7 @@ const Servicios = () => {
         </div>
     );
 
-    const serviceDialogFooter = (
-        <>
-            <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" text onClick={onSubmit} />
-        </>
-    );
+    
 
     const serviceUpdateDialogFooter = (
         <>
@@ -378,50 +344,14 @@ const Servicios = () => {
                         responsiveLayout="scroll"
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                        <Column field="code" header="ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="codigo" header="Codigo" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="nombre_servicio" header="Nombre" sortable body={nombreBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="price" header="Precio" body={precioBodyTemplate} sortable></Column>
-                        <Column field="category" header="Categoria" sortable body={categoriaBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="nombre_categoria" header="Categoria" sortable body={categoriaBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="fecha_creacion" header="Fecha creacion" sortable body={fechaBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column field="inventoryStatus" header="Estado" body={estadoBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-
-                    <Dialog visible={serviceDialog} style={{ width: '450px' }} header="Nuevo Servicio" modal className="p-fluid" footer={serviceDialogFooter} onHide={hideDialog}>
-                        <div className="field">
-                            <label htmlFor="nombre_servicio">Nombre del servicio</label>
-                            <InputText id="nombre_servicio" name="nombre_servicio" value={service.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !service.nombre_servicio })} />
-                            {submitted && !service.nombre_servicio && <small className="p-invalid">El nombre es requerido.</small>}
-                        </div>
-                        <div className="field">
-                            <label htmlFor="description">Descripcion</label>
-                            <InputTextarea id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onChange={onInputChange} required rows={3} cols={20} />
-                        </div>
-
-                        <div className="field">
-                            <label className="mb-3">Categoria</label>
-                            <div className="formgrid grid">
-                                {categorias.map((categoria) => (
-                                    <div className="field-radiobutton col-6" key={categoria.id}>
-                                        <RadioButton
-                                            name="categoria"
-                                            value={categoria.id}
-                                            onChange={onCategoryChange}
-                                            checked={service.categoria === categoria.id}
-                                        />
-                                        <label>{categoria.nombre_categoria}</label>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="formgrid grid">
-                            <div className="field col">
-                                <label htmlFor="price">Precio</label>
-                                <InputNumber id="precio" value={service.precio} name='precio' onValueChange={onInputNumberChange} mode="currency" currency="BOB" locale="es-BO" />
-                            </div>
-                        </div>
-                    </Dialog>
 
                     <Dialog visible={serviceUpdateDialog} style={{ width: '450px' }} header="Actualizar Servicio" modal className="p-fluid" footer={serviceUpdateDialogFooter} onHide={hideDialog}>
                         <div className="field">
@@ -431,7 +361,7 @@ const Servicios = () => {
                         </div>
                         <div className="field">
                             <label htmlFor="description">Descripcion</label>
-                            <InputTextarea id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onChange={onInputChange} required rows={3} cols={20} />
+                            <Editor id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onTextChange={(e) => setService({...service, descripcion_servicio: e.htmlValue})} headerTemplate={headerEditor} style={{ height: '200px' }} />
                         </div>
 
                         <div className="field">
@@ -461,12 +391,6 @@ const Servicios = () => {
                             </div>
                         </div>
 
-                        <div className="formgrid grid">
-                            <div className="field col">
-                                <label htmlFor="price">Precio</label>
-                                <InputNumber id="precio" value={service.precio} name='precio' onValueChange={onInputNumberChange} mode="currency" currency="BOB" locale="es-BO" />
-                            </div>
-                        </div>
                     </Dialog>
 
                     <Dialog visible={deleteServiceDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteServiceDialogFooter} onHide={hideDeleteServiceDialog}>

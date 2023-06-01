@@ -9,8 +9,8 @@ import { FileUpload } from 'primereact/fileupload';
 
 const PerfilUsuario = ({ usuarioId }) => {
   const [id, setid] = useState(null);
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
+  const [nombres, setNombres] = useState('');
+  const [apellidos, setApellidos] = useState('');
   const [correo, setCorreo] = useState('');
   const [contrasenia, setContrasenia] = useState('');
   const [rol, setRol] = useState('');
@@ -35,8 +35,8 @@ const PerfilUsuario = ({ usuarioId }) => {
         const userData = JSON.parse(localStorage.getItem('userData'));
         usuario = {
           id: userData.id,
-          nombre: userData.nombre,
-          apellido: userData.apellido,
+          nombre: userData.nombres,
+          apellido: userData.apellidos,
           correo: userData.correo,
           contrasenia: userData.contrasenia,
           rol: userData.rol
@@ -44,8 +44,8 @@ const PerfilUsuario = ({ usuarioId }) => {
         console.log(usuario);
       }
       setid(usuario.id);
-      setNombre(usuario.nombre);
-      setApellido(usuario.apellido);
+      setNombre(usuario.nombres);
+      setApellido(usuario.apellidos);
       setCorreo(usuario.correo);
       setContrasenia(usuario.contrasenia);
       setRol(usuario.rol);
@@ -57,7 +57,7 @@ const PerfilUsuario = ({ usuarioId }) => {
   };
 
   const guardarUsuario = async () => {
-    if (nombre.trim() === '' || apellido.trim() === '' || correo.trim() === '' || contrasenia.trim() === '' || rol.trim() === '') {
+    if (nombres.trim() === '' || apellidos.trim() === '' || correo.trim() === '' || contrasenia.trim() === '' || rol.trim() === '') {
       showToast('warn', 'Advertencia', 'Por favor completa todos los campos.');
       return;
     }
@@ -65,7 +65,7 @@ const PerfilUsuario = ({ usuarioId }) => {
     setLoading(true);
 
     try {
-      const response = await updateUsuario(id, nombre, apellido, correo, contrasenia, rol);
+      const response = await updateUsuario(id, nombres, apellidos, correo, contrasenia, rol);
       console.log(response);
 
       showToast('success', 'Éxito', 'Usuario guardado correctamente.');
@@ -104,7 +104,7 @@ const PerfilUsuario = ({ usuarioId }) => {
             <label htmlFor="nombre">Nombre:   </label>
             <InputText
               id="nombre"
-              value={nombre}
+              value={nombres}
               onChange={(e) => setNombre(e.target.value)}
               disabled={!editing}
             />
@@ -114,7 +114,7 @@ const PerfilUsuario = ({ usuarioId }) => {
             <label htmlFor="apellido">Apellido:   </label>
             <InputText
               id="apellido"
-              value={apellido}
+              value={apellidos}
               onChange={(e) => setApellido(e.target.value)}
               disabled={!editing}
             />

@@ -10,8 +10,8 @@ import { Toast } from "primereact/toast";
 
 const AgregarUsuario = () => {
   const [usuario, setUsuario] = useState({
-    nombre: "",
-    apellido: "",
+    nombres: "",
+    apellidos: "",
     correo: "",
     contrasenia: "",
     rol: "",
@@ -62,8 +62,8 @@ const AgregarUsuario = () => {
       }
 
       const response = await addUsuarios(
-        usuario.nombre,
-        usuario.apellido,
+        usuario.nombres,
+        usuario.apellidos,
         usuario.correo,
         usuario.contrasenia,
         rol
@@ -78,8 +78,8 @@ const AgregarUsuario = () => {
         });
       }
       setUsuario({
-        nombre: "",
-        apellido: "",
+        nombres: "",
+        apellidos: "",
         correo: "",
         contrasenia: "",
         rol: "",
@@ -124,8 +124,8 @@ const AgregarUsuario = () => {
 
   const limpiarCampos = () => {
     setUsuario({
-      nombre: "",
-      apellido: "",
+      nombres: "",
+      apellidos: "",
       correo: "",
       contrasenia: "",
       rol: "",
@@ -141,22 +141,22 @@ const AgregarUsuario = () => {
       <br />
       <form onSubmit={onSubmit}>
         <div className="field">
-          <label htmlFor="nombre">Nombre</label>
+          <label htmlFor="nombres">Nombre</label>
           <InputText
-            id="nombre"
-            name="nombre"
-            value={usuario.nombre}
+            id="nombres"
+            name="nombres"
+            value={usuario.nombres}
             onChange={onInputChange}
             required
             style={{ width: "100%" }}
           />
         </div>
         <div className="field">
-          <label htmlFor="apellido">Apellido</label>
+          <label htmlFor="apellidos">Apellido</label>
           <InputText
-            id="apellido"
-            name="apellido"
-            value={usuario.apellido}
+            id="apellidos"
+            name="apellidos"
+            value={usuario.apellidos}
             onChange={onInputChange}
             required
             style={{ width: "100%" }}

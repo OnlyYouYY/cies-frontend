@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
-//const BASE_URL = 'http://localhost:4000/api';
+//const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
+const BASE_URL = 'http://localhost:4000/api';
 
 export async function registrar(nombre_servicio, descripcion_servicio, id_categoria, imagen) {
     try {
@@ -86,6 +86,26 @@ export async function mostrarServicios() {
 export async function mostrarServiciosID(id_categoria) {
     try {
         const response = await axios.get(`${BASE_URL}/servicios/servicios/${id_categoria}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarServiciosIDmedico(id_medico) {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/serviciosMedico/${id_medico}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarMedicosIDservicio(id_servicio) {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/medicos/${id_servicio}`);
         return response.data;
     }
     catch (error) {

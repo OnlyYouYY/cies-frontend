@@ -39,20 +39,20 @@ const AppMenu = () => {
                     label: 'Gestión de categorias para servicios',
                     icon: 'pi pi-fw pi-table',
                     items: [
-                        { label: 'Nueva categoria', icon: 'pi pi-fw pi-plus' },
-                        { label: 'Actualizar categoria', icon: 'pi pi-fw pi-pencil'},
+                        { label: 'Nueva categoria', icon: 'pi pi-fw pi-plus', to: '/servicios/categoriaServicios' },
+                        { label: 'Actualizar categoria', icon: 'pi pi-fw pi-pencil', to: '/servicios/actualizarCategoria'},
                     ]
                 },
                 {
                     label: 'Gestión de servicios',
                     icon: 'pi pi-fw pi-briefcase',
                     items: [
-                        { label: 'Nuevo servicio', icon: 'pi pi-fw pi-plus'},
-                        { label: 'Actualizar servicio', icon: 'pi pi-fw pi-pencil'},
-                        { label: 'Listar servicios', icon: 'pi pi-fw pi-list'}
+                        { label: 'Nuevo servicio', icon: 'pi pi-fw pi-plus', to: '/servicios/nuevoServicio' },
+                        { label: 'Actualizar servicio', icon: 'pi pi-fw pi-pencil', to: '/servicios' },
+                        { label: 'Listar servicios', icon: 'pi pi-fw pi-list', to: '/servicios/listarCategorias' }
                     ]
                 },
-                { label: 'Citas', icon: 'pi pi-fw pi-calendar'},
+                { label: 'Registro de fichas', icon: 'pi pi-fw pi-calendar' ,to:'/servicios/citas/nuevaCita'},
             ]
 
         },

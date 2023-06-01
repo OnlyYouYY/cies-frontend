@@ -40,8 +40,8 @@ const App = () => {
     } else {
       const filtrarUsuarios = usuarios.filter(
         (usuario) =>
-          (usuario.nombre && usuario.nombre.includes(searchText)) ||
-          (usuario.apellido && usuario.apellido.includes(searchText)) ||
+          (usuario.nombres && usuario.nombre.includes(searchText)) ||
+          (usuario.apellidos && usuario.apellido.includes(searchText)) ||
           (usuario.correo && usuario.correo.includes(searchText))
       );
       console.log("Usuarios filtrados:", filtrarUsuarios);
@@ -54,11 +54,11 @@ const App = () => {
   };
 
   const nombreBodyTemplate = (rowData) => {
-    return <span>{rowData.nombre}</span>;
+    return <span>{rowData.nombres}</span>;
   };
 
   const apellidoBodyTemplate = (rowData) => {
-    return <span>{rowData.apellido}</span>;
+    return <span>{rowData.apellidos}</span>;
   };
 
   const correoElectronicoBodyTemplate = (rowData) => {
@@ -104,8 +104,8 @@ function exportToPDF() {
       ];
       
       const tableData = usuarios.map(usuarios => ({
-        nombre: usuarios.nombre,
-        apellido: usuarios.apellido,
+        nombre: usuarios.nombres,
+        apellido: usuarios.apellidos,
           correo: usuarios.correo,
           rol: usuarios.rol
       }));
@@ -136,8 +136,8 @@ function exportToExcel() {
     ];
     
     const tableData = usuarios.map(usuarios => ({
-      nombre: usuarios.nombre,
-      apellido: usuarios.apellido,
+      nombre: usuarios.nombres,
+      apellido: usuarios.apellidos,
         correo: usuarios.correo,
         rol: usuarios.rol
     }));
@@ -194,8 +194,8 @@ function exportToExcel() {
       >
         
         <Column field="id" header="ID" body={idBodyTemplate} sortable />
-        <Column field="nombre" header="Nombre" body={nombreBodyTemplate} sortable />
-        <Column field="apellido" header="Apellido" body={apellidoBodyTemplate} sortable />
+        <Column field="nombres" header="Nombre" body={nombreBodyTemplate} sortable />
+        <Column field="apellidos" header="Apellido" body={apellidoBodyTemplate} sortable />
         <Column field="correo_electronico" header="Correo Electrónico" body={correoElectronicoBodyTemplate} sortable />
       </DataTable>
       <Dialog visible={serviceDialogExportar} style={{ width: '450px' }} header="Exportar" modal className="p-fluid" onHide={hideDialogExportar}>

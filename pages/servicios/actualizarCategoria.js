@@ -303,21 +303,21 @@ const ActualizarCategoria = () => {
 
                     </Dialog>
 
-                    <Dialog visible={deleteCategoryDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteServiceDialogFooter} onHide={hideDeleteCategoryDialog}>
+                    <Dialog visible={deleteCategoryDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteServiceDialogFooter} onHide={hideDeleteCategoryDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {categoria && (
                                 <span>
-                                    Esta seguro de eliminar la siguiente categoria: <b>{categoria.nombre_categoria}</b>?
+                                    Esta seguro de dar de baja la siguiente categoria: <b>{categoria.nombre_categoria}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteCategoriesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteCategoriesDialogFooter} onHide={hideDeleteCategoriesDialog}>
+                    <Dialog visible={deleteCategoriesDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteCategoriesDialogFooter} onHide={hideDeleteCategoriesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {categoria && <span>Esta seguro de eliminar las siguientes categorias seleccionadas?</span>}
+                            {categoria && <span>Esta seguro de dar de baja las siguientes categorias seleccionadas?</span>}
                         </div>
                     </Dialog>
                 </div>

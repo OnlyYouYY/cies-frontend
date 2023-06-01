@@ -504,21 +504,21 @@ const Servicios = () => {
 
                     </Dialog>
 
-                    <Dialog visible={deleteServiceDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteServiceDialogFooter} onHide={hideDeleteServiceDialog}>
+                    <Dialog visible={deleteServiceDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteServiceDialogFooter} onHide={hideDeleteServiceDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {service && (
                                 <span>
-                                    Esta seguro de eliminar el siguiente servicio: <b>{service.nombre_servicio}</b>?
+                                    Esta seguro de dar de baja el siguiente servicio: <b>{service.nombre_servicio}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteServicesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteServicesDialogFooter} onHide={hideDeleteServicesDialog}>
+                    <Dialog visible={deleteServicesDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteServicesDialogFooter} onHide={hideDeleteServicesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {service && <span>Esta seguro de eliminar los siguiente servicios seleccionados?</span>}
+                            {service && <span>Esta seguro de dar de baja los siguiente servicios seleccionados?</span>}
                         </div>
                     </Dialog>
 

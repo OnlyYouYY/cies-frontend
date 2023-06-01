@@ -12,9 +12,9 @@ export async function login(username, password) {
   }
 }
 
-export async function register(nombre, apellido, correo, contrasenia, rol) {
+export async function register(nombres, apellidos, correo, contrasenia, rol) {
   try {
-    const response = await axios.post(`${BASE_URL}/usuarios/registrar`, { nombre, apellido, correo, contrasenia, rol });
+    const response = await axios.post(`${BASE_URL}/usuarios/registrar`, { nombres, apellidos, correo, contrasenia, rol });
     return response.data;
   } catch (error) {
     throw error;

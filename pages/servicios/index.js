@@ -21,6 +21,16 @@ import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 const Servicios = () => {
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            if (session == null) {
+                window.location.replace('../auth/login')
+                return null;
+            }
+        }
+    });
+
     let emptyService = {
         id: 0,
         nombre_servicio: '',

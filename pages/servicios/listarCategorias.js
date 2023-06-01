@@ -8,6 +8,15 @@ import 'primeflex/primeflex.css';
 
 const CardBoxCategorias = () => {
 
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            if (session == null) {
+                window.location.replace('../auth/login')
+                return null;
+            }
+        }
+    });
+
     const [categorias, setCategorias] = useState([]);
 
     useEffect(() => {

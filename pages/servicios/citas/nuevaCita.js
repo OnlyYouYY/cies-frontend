@@ -7,11 +7,15 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { Toast } from 'primereact/toast';
 import { AutoComplete } from 'primereact/autocomplete';
-import { listarCategorias, mostrarServiciosID, mostrarServiciosIDmedico, mostrarMedicosIDservicio } from '../../../services/apiService';
+import { listarCategorias, mostrarServiciosID, mostrarServiciosIDmedico, mostrarMedicosIDservicio, mostrarPacientes } from '../../../services/apiService';
 
 export default function ReservaCitas() {
 
     const toast = useRef(null);
+    const [paciente, setPaciente] = useState([]);
+    const [pacientes, setPacientes] = useState([]);
+    const [filteredPacientes, setFilteredPacientes] = useState([]);
+    const [selectedPaciente, setSelectedPaciente] = useState(null);
     const [categorias, setCategorias] = useState([]);
     const [categoria, setCategoria] = useState(null);
     const [categoriasDropdown, setCategoriasDropdown] = useState([]);
@@ -24,7 +28,6 @@ export default function ReservaCitas() {
     const [infoMedico, setInfoMedico] = useState(null);
     const [infoMedicos, setInfoMedicos] = useState([]);
     const [fecha, setFecha] = useState(null);
-    const [hora, setHora] = useState(null);
     const [medicosDelDia, setMedicosDelDia] = useState([]);
 
     const fechaActual = new Date();
@@ -113,7 +116,7 @@ export default function ReservaCitas() {
 
                     const medicosDelDia = infoMedicos.filter(infoMedico => infoMedico.dia_semana === diaActualCapitalizado);
                     setMedicosDelDia(medicosDelDia);
-                    console.log(medicosDelDia);
+                    console.log(diaActualCapitalizado);
                 }
             } catch (error) {
                 console.log(error);
@@ -121,6 +124,40 @@ export default function ReservaCitas() {
         }
         obtenerInfoMedico();
     }, [medico]);
+
+    useEffect(() => {
+        async function obtenerPacientes() {
+            try {
+                const pacientes = await mostrarPacientes();
+                console.log(pacientes);
+
+                const suggestions = pacientes.map(paciente => ({
+                    nombre: `${paciente.nombres} ${paciente.apellidos}`,
+                    ...paciente
+                }));
+
+                setPacientes(suggestions);
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        obtenerPacientes();
+    }, []);
+
+    function buscarPaciente(event) {
+        let filteredPacientes = [];
+
+        if (event.query.trim().length) {
+            filteredPacientes = pacientes.filter(paciente => paciente.nombre.toLowerCase().includes(event.query.toLowerCase()));
+        } else {
+            filteredPacientes = [...pacientes];
+        }
+
+        setFilteredPacientes(filteredPacientes);
+    }
+
+
 
 
     const crearCita = () => {
@@ -166,37 +203,41 @@ export default function ReservaCitas() {
                         <div className="field">
                             <label className='font-bold' htmlFor="medico">Informacion del medico</label>
                             <ul className="list-none p-0 m-0">
-                                {medicosDelDia.map(infoMedico => (
-                                    <React.Fragment key={infoMedico.id}>
-                                        <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
-                                            <div className="text-500 w-6 md:w-2 font-medium">Servicio</div>
-                                            <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">{infoMedico.nombre_servicio}</div>
-                                        </li>
-                                        <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
-                                            <div className="text-500 w-6 md:w-2 font-medium">Dia actual</div>
-                                            <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">
-                                                <Chip label={infoMedico.dia_semana} className="mr-2" />
-                                            </div>
-                                        </li>
-                                        <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
-                                            <div className="text-500 w-6 md:w-2 font-medium">Nombre</div>
-                                            <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">{infoMedico.nombres} {infoMedico.apellidos}</div>
-                                        </li>
-                                        <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
-                                            <div className="text-500 w-6 md:w-2 font-medium">Especialidad</div>
-                                            <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">{infoMedico.especialidad}</div>
+                                {medicosDelDia.length > 0 ? (
+                                    medicosDelDia.map(infoMedico => (
+                                        <React.Fragment key={infoMedico.id}>
+                                            <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
+                                                <div className="text-500 w-6 md:w-2 font-medium">Servicio</div>
+                                                <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">{infoMedico.nombre_servicio}</div>
+                                            </li>
+                                            <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
+                                                <div className="text-500 w-6 md:w-2 font-medium">Dia actual</div>
+                                                <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">
+                                                    <Chip label={infoMedico.dia_semana} className="mr-2" />
+                                                </div>
+                                            </li>
+                                            <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
+                                                <div className="text-500 w-6 md:w-2 font-medium">Nombre</div>
+                                                <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">{infoMedico.nombres} {infoMedico.apellidos}</div>
+                                            </li>
+                                            <li className="flex align-items-center py-3 px-2 border-top-1 border-300 flex-wrap">
+                                                <div className="text-500 w-6 md:w-2 font-medium">Especialidad</div>
+                                                <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1">{infoMedico.especialidad}</div>
 
-                                        </li>
-                                        <li className="flex align-items-center py-3 px-2 border-top-1 border-bottom-1 border-300 flex-wrap">
-                                            <div className="text-500 w-6 md:w-2 font-medium">Horario</div>
-                                            <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1 line-height-3">{infoMedico.hora_inicio} - {infoMedico.hora_final}</div>
-                                        </li>
-                                        <li className="flex align-items-center py-3 px-2 border-top-1 border-bottom-1 border-300 flex-wrap">
-                                            <div className="text-500 w-6 md:w-2 font-medium">Fichas disponibles</div>
-                                            <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1 line-height-3">{infoMedico.fichas_disponibles}</div>
-                                        </li>
-                                    </React.Fragment>
-                                ))}
+                                            </li>
+                                            <li className="flex align-items-center py-3 px-2 border-top-1 border-bottom-1 border-300 flex-wrap">
+                                                <div className="text-500 w-6 md:w-2 font-medium">Horario</div>
+                                                <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1 line-height-3">{infoMedico.hora_inicio} - {infoMedico.hora_final}</div>
+                                            </li>
+                                            <li className="flex align-items-center py-3 px-2 border-top-1 border-bottom-1 border-300 flex-wrap">
+                                                <div className="text-500 w-6 md:w-2 font-medium">Fichas disponibles</div>
+                                                <div className="text-900 w-full md:w-8 md:flex-order-0 flex-order-1 line-height-3">{infoMedico.fichas_disponibles}</div>
+                                            </li>
+                                        </React.Fragment>
+                                    ))
+                                ) : (
+                                    <label>Aun no ha seleccionado un medico disponible</label>
+                                )}
                             </ul>
                         </div>
                     </div>
@@ -215,19 +256,13 @@ export default function ReservaCitas() {
                         </div>
                         <div className="col-12 md:col-6">
                             <div className="field">
-                                <label htmlFor="hora">Hora</label>
-                                <Dropdown id="hora" value={hora} onChange={(e) => setHora(e.value)} placeholder="Seleccione una hora" />
+                                <label htmlFor="nombre">Nombre del paciente</label>
+                                <AutoComplete placeholder="Buscar" id="dd" dropdown value={selectedPaciente} onChange={(e) => setSelectedPaciente(e.value)} suggestions={filteredPacientes} completeMethod={buscarPaciente} field="nombre" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="field">
-                        <label htmlFor="nombre">Nombre del paciente</label>
-                        <AutoComplete placeholder="Buscar nombre" id="dd" dropdown multiple field="name" />
-                    </div>
-
-                    <Button label="Reservar" onClick={crearCita} className="p-mt-3" />
-
+                    <Button label="Reservar ficha" onClick={crearCita} className="p-mt-3" />
 
                 </div>
 

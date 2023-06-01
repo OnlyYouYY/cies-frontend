@@ -158,3 +158,12 @@ export async function eliminarVariasCategorias(ids) {
 }
 
 
+export async function mostrarPacientes() {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/pacientes`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}

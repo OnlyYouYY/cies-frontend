@@ -15,7 +15,10 @@ import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, el
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { use, useEffect, useRef, useState } from 'react';
-import { ServiceService } from '../../demo/service/ServiceService';
+
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 const Servicios = () => {
     let emptyService = {
@@ -26,6 +29,7 @@ const Servicios = () => {
         ruta_imagen: ''
     };
 
+    const [serviceDialogExportar, setServiceDialogExportar] = useState(false);
     const [categorias, setCategorias] = useState([]);
     const [servicios, setServicios] = useState([]);
     const [services, setServices] = useState(null);
@@ -155,12 +159,21 @@ const Servicios = () => {
         let year = date.getFullYear();
         let month = date.getMonth() + 1;
         let day = date.getDate();
-    
+
         month = month < 10 ? '0' + month : month;
         day = day < 10 ? '0' + day : day;
-    
+
         return `${year}-${month}-${day}`;
     }
+
+    //Informes
+    const openNewExportar = () => {
+        setServiceDialogExportar(true);
+    };
+    const hideDialogExportar = () => {
+        setServiceDialogExportar(false);
+    };
+    //Fin informes
 
     const hideDialog = () => {
         setSubmitted(false);
@@ -220,7 +233,7 @@ const Servicios = () => {
         }));
     };
 
-    
+
 
     const idBodyTemplate = (rowData) => {
         return (
@@ -240,7 +253,7 @@ const Servicios = () => {
         );
     };
 
-    
+
 
     const categoriaBodyTemplate = (rowData) => {
         return (
@@ -291,6 +304,7 @@ const Servicios = () => {
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Gestion de Servicios</h5>
             <Button label="Dar de baja" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
+            <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -298,7 +312,7 @@ const Servicios = () => {
         </div>
     );
 
-    
+
 
     const serviceUpdateDialogFooter = (
         <>
@@ -318,6 +332,103 @@ const Servicios = () => {
             <Button label="Si" icon="pi pi-check" text onClick={eliminarServicios} />
         </>
     );
+
+    //Informes
+    function exportToPDF() {
+        if (servicios.length === 0) {
+            toast.current.show({ severity: 'warn', summary: 'Error', detail: 'La tabla de servicios no se pudo exportar porque está vacía.', life: 3000 });
+            return;
+        } else {
+
+            const doc = new jsPDF();
+
+            // Título
+            const title = 'Informe de Servicios';
+            doc.setFontSize(18);
+            doc.text(title, 10, 10);
+
+            // Párrafo introductorio
+            const introText = 'A continuación se presenta un informe detallado de los servicios disponibles en nuestra aplicación. Estos servicios son utilizados por nuestros clientes para satisfacer sus necesidades en diferentes áreas. El informe incluye información relevante sobre cada servicio, como su nombre, descripción, precio, categoría y fecha de creación. Esperamos que este informe sea útil para comprender mejor nuestra oferta de servicios.';
+        
+            const splitIntroText = doc.splitTextToSize(introText, doc.internal.pageSize.getWidth() - 20);
+            doc.setFontSize(12);
+            doc.text(splitIntroText, 10, 20);
+            
+            const startY = doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 60;
+
+            const tableColumns = [
+                { header: 'Codigo', dataKey: 'codigo'},
+                { header: 'Nombre', dataKey: 'nombre_servicio' },
+                { header: 'Categoria', dataKey: 'nombre_categoria' },
+                { header: 'Estado', dataKey:'estado_servicio' },
+                { header: 'Fecha creacion', dataKey: 'fecha_creacion' },
+            ];
+
+            const tableData = servicios.map(servicio => ({
+                codigo: servicio.codigo,
+                nombre_servicio: servicio.nombre_servicio,
+                nombre_categoria: servicio.nombre_categoria,
+                estado_servicio: servicio.estado_servicio,
+                fecha_creacion: formatDate(servicio.fecha_creacion)
+            }));
+
+            doc.autoTable(tableColumns, tableData, {
+                startY,
+                margin: { top: 5 },
+            });
+
+            doc.save('tabla_servicios.pdf');
+        }
+    }
+
+
+    function exportToExcel() {
+        if (servicios.length === 0) {
+            // La tabla está vacía, muestra un mensaje o realiza alguna acción apropiada
+            console.log('La tabla de servicios está vacía.');
+            toast.current.show({ severity: 'warn', summary: 'Error', detail: 'La tabla de servicios no se pudo exportar porque está vacía.', life: 3000 });
+            return;
+        } else {
+            const doc = new jsPDF();
+        
+            const tableColumns = [
+                { header: 'Codigo', dataKey: 'codigo'},
+                { header: 'Nombre', dataKey: 'nombre_servicio' },
+                { header: 'Categoria', dataKey: 'nombre_categoria' },
+                { header: 'Estado', dataKey:'estado_servicio' },
+                { header: 'Fecha creacion', dataKey: 'fecha_creacion' },
+            ];
+            
+            const tableData = servicios.map(servicio => ({
+                codigo: servicio.codigo,
+                nombre_servicio: servicio.nombre_servicio,
+                nombre_categoria: servicio.nombre_categoria,
+                estado_servicio: servicio.estado_servicio,
+                fecha_creacion: formatDate(servicio.fecha_creacion)
+            }));
+            
+            doc.autoTable(tableColumns, tableData, {
+                startY: 60,
+                margin: { top: 10 },
+            });
+            
+            const tableHeader = tableColumns.map(column => column.header);
+            const tableRows = tableData.map(data => tableColumns.map(column => data[column.dataKey]));
+            
+            const worksheet = XLSX.utils.aoa_to_sheet([tableHeader, ...tableRows]);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Servicios');
+            
+            const excelFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            
+            // Descargar el archivo Excel
+            const excelBlob = new Blob([excelFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const excelLink = document.createElement('a');
+            excelLink.href = URL.createObjectURL(excelBlob);
+            excelLink.download = 'tabla_servicios.xlsx';
+            excelLink.click();
+        }
+    }
 
     return (
         <div className="grid crud-demo">
@@ -361,7 +472,7 @@ const Servicios = () => {
                         </div>
                         <div className="field">
                             <label htmlFor="description">Descripcion</label>
-                            <Editor id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onTextChange={(e) => setService({...service, descripcion_servicio: e.htmlValue})} headerTemplate={headerEditor} style={{ height: '200px' }} />
+                            <Editor id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onTextChange={(e) => setService({ ...service, descripcion_servicio: e.htmlValue })} headerTemplate={headerEditor} style={{ height: '200px' }} />
                         </div>
 
                         <div className="field">
@@ -408,6 +519,18 @@ const Servicios = () => {
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {service && <span>Esta seguro de eliminar los siguiente servicios seleccionados?</span>}
+                        </div>
+                    </Dialog>
+
+                    <Dialog visible={serviceDialogExportar} style={{ width: '450px' }} header="Exportar" modal className="p-fluid" onHide={hideDialogExportar}>
+                        
+                        <div className="field" style={{ display: 'flex', gap: '10px' }}>
+                            <label htmlFor="formato">En que formato quiere el reporte</label>
+                        </div>
+                        
+                        <div className="field" style={{ display: 'flex', gap: '10px' }}>
+                            <Button label="Exportar en EXCEL" icon="pi pi-upload" severity="success" onClick={exportToExcel} />
+                            <Button label="Exportar en PDF" icon="pi pi-upload" severity="danger" onClick={exportToPDF} />
                         </div>
                     </Dialog>
                 </div>

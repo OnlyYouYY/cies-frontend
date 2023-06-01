@@ -19,14 +19,7 @@ import { ServiceService } from '../../demo/service/ServiceService';
 
 const ActualizarCategoria = () => {
 
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            if (session == null) {
-                window.location.replace('../auth/login')
-                return null;
-            }
-        }
-    });
+    
 
     let emptyCategory = {
         nombre_categoria: '',

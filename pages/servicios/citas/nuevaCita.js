@@ -11,14 +11,6 @@ import { listarCategorias, mostrarServiciosID, mostrarServiciosIDmedico, mostrar
 
 export default function ReservaCitas() {
 
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            if (session == null) {
-                window.location.replace('../../auth/login')
-                return null;
-            }
-        }
-    });
 
     const toast = useRef(null);
     const [paciente, setPaciente] = useState([]);

@@ -14,14 +14,6 @@ import { listarCategorias, registrarCategoria } from '../../services/apiService'
 
 export const NuevoServicio = () => {
 
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            if (session == null) {
-                window.location.replace('../auth/login')
-                return null;
-            }
-        }
-    });
 
     let emptyCategory = {
         nombre_categoria: '',

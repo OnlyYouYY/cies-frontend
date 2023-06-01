@@ -14,14 +14,6 @@ import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, el
 
 export const NuevoServicio = () => {
 
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            if (session == null) {
-                window.location.replace('../auth/login')
-                return null;
-            }
-        }
-    });
 
     let emptyService = {
         nombre_servicio: ''

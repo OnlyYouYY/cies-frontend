@@ -16,8 +16,8 @@ const Usuarios = () => {
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const toast = useRef(null);
-  const [nombre, setNombre] = useState("");
-  const [apellido, setApellido] = useState("");
+  const [nombres, setNombres] = useState("");
+  const [apellidos, setApellidos] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [rol, setRol] = useState("");
@@ -63,7 +63,7 @@ const Usuarios = () => {
       setUsuarioSeleccionado(usuario);
       console.log("Se confirma la eliminacion");
       confirmDialog({
-        message: `¿Estás seguro de que quieres eliminar a ${usuario.nombre}?`,
+        message: `¿Estás seguro de que quieres eliminar a ${usuario.nombres}?`,
         header: "Confirmar Eliminación",
         icon: "pi pi-exclamation-triangle",
         accept: () => eliminarUsuario(usuario.id), // Pasa usuario.id en lugar de usuario
@@ -75,8 +75,8 @@ const Usuarios = () => {
 
   const editarUsuario = (usuario) => {
     setUsuarioSeleccionado(usuario);
-    setNombre(usuario.nombre);
-    setApellido(usuario.apellido);
+    setNombres(usuario.nombres);
+    setApellidos(usuario.apellidos);
     setCorreo(usuario.correo);
     setContrasenia(usuario.contrasenia);
     setRol(usuario.rol);
@@ -84,7 +84,7 @@ const Usuarios = () => {
   };
 
   const guardarCambios = async () => {
-    if (!nombre || !apellido || !correo || !rol) {
+    if (!nombres || !apellidos || !correo || !rol) {
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -97,8 +97,8 @@ const Usuarios = () => {
     try {
       await actualizar(
         usuarioSeleccionado.id,
-        nombre,
-        apellido,
+        nombres,
+        apellidos,
         correo,
         contrasenia,
         rol
@@ -124,8 +124,8 @@ const Usuarios = () => {
 
   const cerrarDialogo = () => {
     setUsuarioSeleccionado(null);
-    setNombre("");
-    setApellido("");
+    setNombres("");
+    setApellidos("");
     setCorreo("");
     setContrasenia("");
     setRol("");
@@ -162,8 +162,8 @@ const Usuarios = () => {
       <h5>Seleccione al usuario que desea editar o eliminar</h5>
       <Toast ref={toast} />
       <DataTable value={usuarios} className="p-datatable-striped">
-        <Column field="nombre" header="Nombre" />
-        <Column field="apellido" header="Apellido" />
+        <Column field="nombres" header="Nombres" />
+        <Column field="apellidos" header="Apellidos" />
         <Column field="correo" header="Correo" />
         <Column field="rol" header="Rol" />
         <Column

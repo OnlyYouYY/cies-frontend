@@ -196,8 +196,8 @@ const Usuarios = () => {
           </div>
           <div className="p-col-8">
             <InputText
-              id="nombre"
-              value={nombre}
+              id="nombres"
+              value={nombres}
               onChange={(e) => setNombre(e.target.value)}
             />
           </div>
@@ -206,8 +206,8 @@ const Usuarios = () => {
           </div>
           <div className="p-col-8">
             <InputText
-              id="apellido"
-              value={apellido}
+              id="apellidos"
+              value={apellidos}
               onChange={(e) => setApellido(e.target.value)}
             />
           </div>

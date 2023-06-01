@@ -17,8 +17,8 @@ import Link from 'next/link';
 
 const RegisterPage = () => {
 
-    const [nombre, setNombre] = useState('');
-    const [apellido, setApellido] = useState('');
+    const [nombres, setNombres] = useState('');
+    const [apellidos, setApellidos] = useState('');
     const [correo, setCorreo] = useState('');
     const [contrasenia, setContrasenia] = useState('');
     const [confirmContrasenia, setConfirmContrasenia] = useState('');
@@ -54,12 +54,12 @@ const RegisterPage = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!nombre || !apellido || !correo || !contrasenia || !rol) {
+        if (!nombres || !apellidos || !correo || !contrasenia || !rol) {
             toast.warning('Por favor completa todos los campos');
             return;
         }
         try {
-            const response = await register(nombre, apellido, correo, contrasenia, rol);
+            const response = await register(nombres, apellidos, correo, contrasenia, rol);
             console.log(response);
             if (typeof window !== 'undefined') {
                 window.location.replace('../auth/login');
@@ -91,11 +91,11 @@ const RegisterPage = () => {
                             <label htmlFor="nombres" className="block text-900 text-xl font-medium mb-2">
                                 Nombres
                             </label>
-                            <InputText inputid="nombres1" value={nombre} onChange={(event) => setNombre(event.target.value)} type="text" placeholder="Nombres" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }}></InputText>
+                            <InputText inputid="nombres1" value={nombres} onChange={(event) => setNombres(event.target.value)} type="text" placeholder="Nombres" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }}></InputText>
                             <label htmlFor="apellidos" className="block text-900 text-xl font-medium mb-2">
                                 Apellidos
                             </label>
-                            <InputText inputid="apellidos1" value={apellido} onChange={(event) => setApellido(event.target.value)} type="text" placeholder="Apellidos" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }}></InputText>
+                            <InputText inputid="apellidos1" value={apellidos} onChange={(event) => setApellidos(event.target.value)} type="text" placeholder="Apellidos" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }}></InputText>
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Correo electronico
                             </label>

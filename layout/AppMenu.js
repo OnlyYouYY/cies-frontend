@@ -103,7 +103,6 @@ const AppMenu = () => {
                         { label: 'Listar usuarios', icon: 'pi pi-fw pi-list', to: '/usuarios/listarUsuario' },
                     ]
                 },
-                { label: 'Generación de informes', icon: 'pi pi-fw pi-file-excel' },
                 { label: 'Configuración del sistema', icon: 'pi pi-fw pi-cog' }
             ]
 

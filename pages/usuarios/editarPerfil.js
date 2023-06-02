@@ -35,8 +35,8 @@ const PerfilUsuario = ({ usuarioId }) => {
         const userData = JSON.parse(localStorage.getItem('userData'));
         usuario = {
           id: userData.id,
-          nombre: userData.nombres,
-          apellido: userData.apellidos,
+          nombres: userData.nombres,
+          apellidos: userData.apellidos,
           correo: userData.correo,
           contrasenia: userData.contrasenia,
           rol: userData.rol
@@ -44,12 +44,12 @@ const PerfilUsuario = ({ usuarioId }) => {
         console.log(usuario);
       }
       setid(usuario.id);
-      setNombre(usuario.nombres);
-      setApellido(usuario.apellidos);
+      setNombres(usuario.nombres);
+      setApellidos(usuario.apellidos);
       setCorreo(usuario.correo);
       setContrasenia(usuario.contrasenia);
       setRol(usuario.rol);
-      console.log(nombre);
+      console.log(nombres);
     } catch (error) {
       console.error('Error al cargar el usuario:', error);
       showToast('error', 'Error', 'No se pudo cargar el usuario.');
@@ -101,21 +101,21 @@ const PerfilUsuario = ({ usuarioId }) => {
         <h2 className='card'>EDITAR PERFIL DE USUARIO</h2>
         <Card title="Perfil de Usuario" className="card-form" style={{ width: '50%', float:'left', marginTop:'35px' }}>
           <div className="p-mb-3">
-            <label htmlFor="nombre">Nombre:   </label>
+            <label htmlFor="nombres">Nombre:   </label>
             <InputText
-              id="nombre"
+              id="nombres"
               value={nombres}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) => setNombres(e.target.value)}
               disabled={!editing}
             />
           </div>
           <br />
           <div className="p-mb-3">
-            <label htmlFor="apellido">Apellido:   </label>
+            <label htmlFor="apellidos">Apellido:   </label>
             <InputText
-              id="apellido"
+              id="apellidos"
               value={apellidos}
-              onChange={(e) => setApellido(e.target.value)}
+              onChange={(e) => setApellidos(e.target.value)}
               disabled={!editing}
             />
           </div>

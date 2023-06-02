@@ -46,7 +46,7 @@ const Dashboard = () => {
                 <div id="highlights" className="py-4 px-4 lg:px-8 mx-0 my-6 lg:mx-8">
                     <div className="text-center">
                         <h2 className="text-900 font-normal mb-2">Novedades</h2>
-                        <span className="text-600 text-2xl">Version 0.0.1</span>
+                        <span className="text-600 text-2xl">Version 0.5.0</span>
                     </div>
 
                     <div className="grid my-8 pt-2 md:pt-8">

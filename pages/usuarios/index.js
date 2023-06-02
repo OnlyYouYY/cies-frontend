@@ -48,8 +48,8 @@ const Usuarios = () => {
     const nombreBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Nombre</span>
-                {rowData.nombre}
+                <span className="p-column-title">Nombres</span>
+                {rowData.nombres}
             </>
         );
     };
@@ -57,8 +57,8 @@ const Usuarios = () => {
     const apellidoBodyTemplate = (rowData) => {
         return (
             <>
-                <span className="p-column-title">Apellido</span>
-                {rowData.apellido}
+                <span className="p-column-title">Apellidos</span>
+                {rowData.apellidos}
             </>
         );
     };
@@ -111,8 +111,8 @@ const Usuarios = () => {
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
                         <Column field="code" header="ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="nombre" header="Nombre" sortable body={nombreBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="apellido" header="Apellido" body={apellidoBodyTemplate} sortable></Column>
+                        <Column field="nombres" header="Nombres" sortable body={nombreBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="apellido" header="Apellidos" body={apellidoBodyTemplate} sortable></Column>
                         <Column field="correo" header="Correo" body={correoBodyTemplate} sortable></Column>
                         <Column field="contrasenia" header="Contrasenia" body={contraseniaBodyTemplate} sortable></Column>
                         <Column field="rol" header="Rol" sortable body={rolBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>

@@ -105,13 +105,13 @@ const Layout = (props) => {
     return (
         <React.Fragment>
             <Head>
-                <title>CIES Panel de control</title>
+                <title>CIES Pro Manage</title>
                 <meta charSet="UTF-8" />
                 <meta name="description" content="CIES es un sistema moderno e innovador que revoluciona la gestión de clínicas. Con una interfaz amigable y fácil de usar, permite a los usuarios acceder a la información de la clínica de manera eficiente y efectiva." />
                 <meta name="robots" content="index, follow" />
                 <meta name="viewport" content="initial-scale=1, width=device-width" />
                 <meta property="og:type" content="website"></meta>
-                <meta property="og:title" content="CIES Panel de control"></meta>
+                <meta property="og:title" content="CIES Pro Manage"></meta>
                 <meta property="og:ttl" content="604800"></meta>
                 <link rel="icon" href={`/favicon.ico`} type="image/x-icon"></link>
             </Head>

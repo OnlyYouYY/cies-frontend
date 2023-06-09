@@ -52,6 +52,7 @@ const AppTopbar = forwardRef((props, ref) => {
 
                 <Button label="Cerrar Sesion" severity="danger" className='ml-3' onClick={() => {
                     localStorage.removeItem('userData');
+                    localStorage.removeItem('userRole');
                     removeSession();
                     Router.push('../auth/login');
                 }}/>

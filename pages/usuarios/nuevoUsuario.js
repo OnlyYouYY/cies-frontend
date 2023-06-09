@@ -3,12 +3,33 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { addUsuarios, filtrarUsuarios } from "../../services/apiUsuarios";
 import { Dropdown } from "primereact/dropdown";
-import "primereact/resources/primereact.min.css";
-import "primereact/resources/themes/saga-blue/theme.css";
-import "primeicons/primeicons.css";
 import { Toast } from "primereact/toast";
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 const AgregarUsuario = () => {
+
+  const session = getSession();
+  const router = useRouter();
+
+  const rolesPermitidos = ['administrador'];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const rolUsuarioEncriptado = localStorage.getItem('userRole');
+      if (session == null || rolUsuarioEncriptado == null) {
+        router.replace('/pages/notfound');
+        return;
+      }
+      const rolUsuario = decryptData(rolUsuarioEncriptado);
+      if (!rolesPermitidos.includes(rolUsuario)) {
+        router.replace('/pages/notfound');
+        return;
+      }
+    }
+  });
+
   const [usuario, setUsuario] = useState({
     nombres: "",
     apellidos: "",

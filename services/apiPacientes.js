@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
+const BASE_URL = 'http://localhost:4000/api';
 
 export async function registrar(nombres, apellidos, fecha_nacimiento, sexo, telefono, correo_electronico, id_direccion, usuario, contrasenia) {
     try {

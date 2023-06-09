@@ -4,12 +4,33 @@ import { Button } from 'primereact/button';
 import { Image } from 'primereact/image';
 import { listarProductos} from '../../services/apiProductos';
 import 'primeflex/primeflex.css';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 const CardBox = () => {
 
-    const [productos, setProductos] = useState([]);  //servicios, setServicios
+    const session = getSession();
+    const router = useRouter();
 
-    //con esto haremos que se carge la informacion  consulta del back de manera automatica
+    const rolesPermitidos = ['administrador', 'farmaceutico'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
+
+    const [productos, setProductos] = useState([]);
     useEffect(() => {
         async function mostrarProductos() {
             try {

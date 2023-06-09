@@ -11,9 +11,31 @@ import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, eliminarVarios, listarServicios } from '../../services/apiService';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 export const NuevoServicio = () => {
 
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
 
     let emptyService = {
         nombre_servicio: ''
@@ -211,11 +233,11 @@ export const NuevoServicio = () => {
             <div className="col-12 md:col-6">
                 <div className="card p-fluid">
                     <h5>Servicios</h5>
-                    <DataTable value={servicios} scrollable scrollHeight="400px" loading={loading2} className="mt-3">
-                        <Column field="codigo" header="Codigo" style={{ flexGrow: 1, flexBasis: '100px' }}></Column>
+                    <DataTable value={servicios} scrollable scrollHeight="100%" loading={loading2} className="mt-3">
+                        <Column field="codigo" header="Codigo" style={{ flexGrow: 1, flexBasis: '160px' }}></Column>
                         <Column field="nombre_servicio" header="Nombre" style={{ flexGrow: 1, flexBasis: '160px' }} className="font-bold"></Column>
                         <Column field="nombre_categoria" header="Categoria" style={{ flexGrow: 1, flexBasis: '160px' }}></Column>
-                        <Column field="fecha_creacion" header="Fecha creacion" style={{ flexGrow: 1, flexBasis: '200px' }} body={dateBodyTemplate}></Column>
+                        <Column field="fecha_creacion" header="Fecha creacion" style={{ flexGrow: 1, flexBasis: '100px' }} body={dateBodyTemplate}></Column>
                     </DataTable>
                 </div>
             </div>

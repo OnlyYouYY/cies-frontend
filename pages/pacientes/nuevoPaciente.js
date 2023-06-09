@@ -9,8 +9,31 @@ import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { registrar, listarDirecciones } from '../../services/apiPacientes';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 export const NuevoPaciente = () => {
+
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador', 'recepcionista'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
 
     let emptyPaciente = {
         nombres: '',

@@ -5,9 +5,31 @@ import { Button } from 'primereact/button';
 import { Image } from 'primereact/image';
 import { listarCategorias } from '../../services/apiService';
 import 'primeflex/primeflex.css';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 const CardBoxCategorias = () => {
 
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador', 'recepcionista', 'medico'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
 
     const [categorias, setCategorias] = useState([]);
 

@@ -1,17 +1,28 @@
 import { Button } from 'primereact/button';
-import { getSession } from '../utils/session';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
+import { getSession } from '../utils/session';
+import { decryptData } from '../services/crypto';
 
 const Dashboard = () => {
     const logo = 'https://www.cies.org.bo/wp-content/uploads/2021/04/IMG_3867-scaled.jpg';
     const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador', 'recepcionista', 'farmaceutico', 'medico'];
 
     useEffect(()=>{
         if (typeof window !== 'undefined') {
-            if (session == null) {
-                window.location.replace('./auth/login')
-                return null;
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/auth/login');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/auth/login');
+                return;
             }
         }
     });

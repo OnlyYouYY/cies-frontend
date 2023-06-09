@@ -6,8 +6,32 @@ import { getUsuario, updateUsuario } from '../../services/apiUsuarios';
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from 'primereact/card';
 import { FileUpload } from 'primereact/fileupload';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 const PerfilUsuario = ({ usuarioId }) => {
+
+  const session = getSession();
+  const router = useRouter();
+
+  const rolesPermitidos = ['administrador', 'recepcionista', 'medico', 'farmaceutico'];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const rolUsuarioEncriptado = localStorage.getItem('userRole');
+      if (session == null || rolUsuarioEncriptado == null) {
+        router.replace('/pages/notfound');
+        return;
+      }
+      const rolUsuario = decryptData(rolUsuarioEncriptado);
+      if (!rolesPermitidos.includes(rolUsuario)) {
+        router.replace('/pages/notfound');
+        return;
+      }
+    }
+  });
+
   const [id, setid] = useState(null);
   const [nombres, setNombres] = useState('');
   const [apellidos, setApellidos] = useState('');
@@ -99,7 +123,7 @@ const PerfilUsuario = ({ usuarioId }) => {
     <div className="p-grid">
       <div className="p-col-12 p-md-6">
         <h2 className='card'>EDITAR PERFIL DE USUARIO</h2>
-        <Card title="Perfil de Usuario" className="card-form" style={{ width: '50%', float:'left', marginTop:'35px' }}>
+        <Card title="Perfil de Usuario" className="card-form" style={{ width: '50%', float: 'left', marginTop: '35px' }}>
           <div className="p-mb-3">
             <label htmlFor="nombres">Nombre:   </label>
             <InputText
@@ -169,56 +193,56 @@ const PerfilUsuario = ({ usuarioId }) => {
       <br />
       <br />
       <div className="p-col-12 p-md-6 p-lg-4">
-        <Card title="Subir Imagen" className="card-form" style={{ width: '45%', marginLeft: '50%', position: 'left'}}>
+        <Card title="Subir Imagen" className="card-form" style={{ width: '45%', marginLeft: '50%', position: 'left' }}>
           <h6>Foto de Perfil</h6>
           <FileUpload
-            key={fileKey} 
+            key={fileKey}
             mode="basic"
             chooseLabel="Seleccionar"
             customUpload
             uploadHandler={uploadFile}
             onSelect={onFileSelect}
-            style={{display:'inline-block', marginRight:'10px'}}
-           
-          
+            style={{ display: 'inline-block', marginRight: '10px' }}
+
+
           />
-          <br/>
-         
+          <br />
+
           {selectedFile && (
-            <div className="p-mt-2" style={{float:'right'}}>
+            <div className="p-mt-2" style={{ float: 'right' }}>
               <Button
                 label="Cancelar"
                 icon="pi pi-times"
                 className="p-button-primary"
                 onClick={cancelarSubida}
-                
-              
+
+
               />
             </div>
           )}
-          
+
           <div className="container">
-          {selectedFile && (
-            <div>
-              <img
-                src={URL.createObjectURL(selectedFile)}
-                alt="Imagen seleccionada"
-                style={{
-                  marginTop: '10px',
-                  maxWidth: '100%',
-                  height: 'auto',
-                  maxHeight: '250px',
-                  borderRadius:'50%',
-                  
-          
-                }}
-              />
-            </div>
-            
-          )}
+            {selectedFile && (
+              <div>
+                <img
+                  src={URL.createObjectURL(selectedFile)}
+                  alt="Imagen seleccionada"
+                  style={{
+                    marginTop: '10px',
+                    maxWidth: '100%',
+                    height: 'auto',
+                    maxHeight: '250px',
+                    borderRadius: '50%',
+
+
+                  }}
+                />
+              </div>
+
+            )}
           </div>
-         
-         
+
+
         </Card>
       </div>
     </div>

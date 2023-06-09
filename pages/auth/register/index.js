@@ -1,5 +1,5 @@
 import Router, { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import AppConfig from '../../../layout/AppConfig';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
@@ -10,13 +10,15 @@ import { LayoutContext } from '../../../layout/context/layoutcontext';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { register } from '../../../services/api';
-import { toast } from 'react-toastify';
+import { Toast } from "primereact/toast";
 import Head from 'next/head';
 import Link from 'next/link';
 
 
 const RegisterPage = () => {
 
+    const router = useRouter();
+    const toast = useRef(null);
     const [nombres, setNombres] = useState('');
     const [apellidos, setApellidos] = useState('');
     const [correo, setCorreo] = useState('');
@@ -36,26 +38,28 @@ const RegisterPage = () => {
 
     const handlePasswordChange = (event) => {
         setContrasenia(event.target.value);
-        if (event.target.value !== confirmContrasenia) {
-            toast.warning('Las contraseñas no coinciden');
-        } else {
-            toast.success('Coinciden');
-        }
     };
-    
+
     const handleConfirmPasswordChange = (event) => {
         setConfirmContrasenia(event.target.value);
-        if (event.target.value !== contrasenia) {
-            toast.warning('Las contraseñas no coinciden');
-        } else {
-            toast.success('Coinciden');
+    };
+
+    const handlePasswordBlur = () => {
+        if (confirmContrasenia && contrasenia !== confirmContrasenia) {
+            toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
+        } else if (confirmContrasenia && contrasenia === confirmContrasenia) {
+            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Las contraseñas coinciden', life: 3000 });
         }
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!nombres || !apellidos || !correo || !contrasenia || !rol) {
-            toast.warning('Por favor completa todos los campos');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor completa todos los campos', life: 3000 });
+            return;
+        }
+        if (contrasenia !== confirmContrasenia) {
+            toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
             return;
         }
         try {
@@ -63,12 +67,12 @@ const RegisterPage = () => {
             console.log(response);
             if (typeof window !== 'undefined') {
                 window.location.replace('../auth/login');
-                toast.success("Usuario registrado");
+                toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Usuario registrado', life: 3000 });
             }
-            
+
         } catch (error) {
             console.log(error);
-            toast.error('Datos incorrectos');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos incorrectos', life: 3000 });
         }
     };
 
@@ -79,6 +83,7 @@ const RegisterPage = () => {
             <Head>
                 <title>Registro de usuario</title>
             </Head>
+            <Toast ref={toast} />
             <div className="flex flex-column align-items-center justify-content-center">
                 <img src={`/layout/images/logo-simple.png`} alt="Cies logo" className="mb-5 w-6rem flex-shrink-0" />
                 <div style={{ borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(255, 165, 0, 0) 40%)' }}>
@@ -103,11 +108,11 @@ const RegisterPage = () => {
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Contraseña
                             </label>
-                            <Password inputid="password1" value={contrasenia} onChange={handlePasswordChange} placeholder="Contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={15}></Password>
+                            <Password inputid="password1" value={contrasenia} onChange={handlePasswordChange} placeholder="Contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={18}></Password>
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Confirmar contraseña
                             </label>
-                            <Password inputid="confirmpassword1" value={confirmContrasenia} onChange={handleConfirmPasswordChange} placeholder="Confirmar contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={15}></Password>
+                            <Password inputid="confirmpassword1" value={confirmContrasenia} onChange={handleConfirmPasswordChange} onBlur={handlePasswordBlur} placeholder="Confirmar contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={18}></Password>
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Tipo de acceso
                             </label>
@@ -117,7 +122,7 @@ const RegisterPage = () => {
                                 <span>Espera la confirmacion por correo electronico para acceder.</span>
                             </div>
                         </form>
-                        <Button icon="pi pi-arrow-left" className="block w-full" style={{ color: 'var(--primary-color)'}} label="Iniciar Sesion" text onClick={() => Router.push('/auth/login')} />
+                        <Button icon="pi pi-arrow-left" className="block w-full" style={{ color: 'var(--primary-color)' }} label="Iniciar Sesion" text onClick={() => Router.push('/auth/login')} />
                     </div>
                 </div>
             </div>

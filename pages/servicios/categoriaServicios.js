@@ -11,9 +11,31 @@ import { FileUpload } from 'primereact/fileupload';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { listarCategorias, registrarCategoria } from '../../services/apiService';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 export const NuevoServicio = () => {
 
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador'];
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
 
     let emptyCategory = {
         nombre_categoria: '',
@@ -43,7 +65,7 @@ export const NuevoServicio = () => {
             text.trim() !== "" &&
             selectedImageCategory) {
             try {
-                const response = await registrarCategoria(categoria.nombre_categoria, text ,selectedImageCategory);
+                const response = await registrarCategoria(categoria.nombre_categoria, text, selectedImageCategory);
                 console.log(response);
                 toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Categoria creada', life: 3000 });
                 setCategoria(emptyCategory);
@@ -74,7 +96,7 @@ export const NuevoServicio = () => {
         }
         obtenerCategorias();
     }, []);
-    
+
 
 
     const renderHeader = () => {
@@ -117,10 +139,10 @@ export const NuevoServicio = () => {
         let year = date.getFullYear();
         let month = date.getMonth() + 1;
         let day = date.getDate();
-    
+
         month = month < 10 ? '0' + month : month;
         day = day < 10 ? '0' + day : day;
-    
+
         return `${year}-${month}-${day}`;
     }
 
@@ -139,8 +161,8 @@ export const NuevoServicio = () => {
 
                     <div className="field">
                         <label htmlFor="nombreCategoria">Nombre de la categoria</label>
-                        <InputText id="nombre_categoria" name="nombre_categoria" value={categoria.nombre_categoria} onChange={onInputChange}/>
-                        
+                        <InputText id="nombre_categoria" name="nombre_categoria" value={categoria.nombre_categoria} onChange={onInputChange} />
+
 
                     </div>
                     <div className="field">
@@ -185,7 +207,7 @@ export const NuevoServicio = () => {
             <div className="col-12 md:col-6">
                 <div className="card p-fluid">
                     <h5>Categorias</h5>
-                    <DataTable value={categorias} scrollable scrollHeight="400px" loading={loading2} className="mt-3">
+                    <DataTable value={categorias} scrollable scrollHeight="100%" loading={loading2} className="mt-3">
                         <Column field="codigo" header="Codigo" style={{ flexGrow: 1, flexBasis: '100px' }}></Column>
                         <Column field="nombre_categoria" header="Nombre" style={{ flexGrow: 1, flexBasis: '160px' }} className="font-bold"></Column>
                         <Column field="fecha_creacion" header="Fecha creacion" style={{ flexGrow: 1, flexBasis: '200px' }} body={dateBodyTemplate}></Column>

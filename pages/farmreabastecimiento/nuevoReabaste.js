@@ -7,8 +7,32 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { listarProveedores,registrar} from '../../services/apiReabastecimiento';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 export const NuevoReabastecimiento = () => {
+
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador', 'farmaceutico'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
+
     let emptyRestock = {
         pedido_producto: '',
         cantidad_reabastecida: 0,

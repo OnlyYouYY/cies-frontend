@@ -5,8 +5,32 @@ import { Image } from 'primereact/image';
 import { listarProveedores} from '../../services/apiProveedores';
 import 'primeflex/primeflex.css';
 import { render } from 'react-dom';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
+
 
 const CardBox = () => {
+
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador', 'farmaceutico'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
 
     const [proveedores, setProveedores] = useState([]);
 

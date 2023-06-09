@@ -13,10 +13,32 @@ import { classNames } from 'primereact/utils';
 import React, { use, useEffect, useRef, useState } from 'react';
 import { ServiceService } from '../../demo/service/ServiceService';
 import { mostrarUsuarios, actualizar, eliminar, nuevoUsuario } from '../../services/apiUsuarios';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
-
-//Obtener y mostrar a todos los usuario registrados
 const Usuarios = () => {
+
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
+
     const [usuarios, setUsuarios] = useState([]);
     const [submitted, setSubmitted] = useState(false);
 

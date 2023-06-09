@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import AppConfig from '../../../layout/AppConfig';
 import { Checkbox } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
@@ -9,32 +9,38 @@ import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
 import { login } from '../../../services/api';
 import { setSession } from '../../../utils/session';
-import { toast } from 'react-toastify';
+import { Toast } from "primereact/toast";
+import { encryptData, decryptData } from '../../../services/crypto';
 import Head from 'next/head';
 import Link from 'next/link';
 
 
 const LoginPage = () => {
+    const toast = useRef(null);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { layoutConfig } = useContext(LayoutContext);
+    const router = useRouter();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (!username || !password) {
-            toast.warning('Por favor completa ambos campos');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor completa ambos campos', life: 3000 });
             return;
         }
         try {
             const response = await login(username, password);
             console.log(response);
             setSession(response.token);
-            localStorage.setItem('userData', JSON.stringify(response.result[0]));
-            if (typeof window !== 'undefined') {
-                window.location.replace('../../');
-            }
+            const userData = response.usuario[0];
+            localStorage.setItem('userData', JSON.stringify(userData));
+            const encryptedUserRole = encryptData(userData.rol);
+            localStorage.setItem('userRole', encryptedUserRole);
+            router.push('../../');
         } catch (error) {
-            toast.error('El usuario o la contraseña son incorrectos');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Correo o contraseña incorrectos', life: 3000 });
+            console.log(error);
+
         }
     };
 
@@ -47,6 +53,7 @@ const LoginPage = () => {
             <Head>
                 <title>Login</title>
             </Head>
+            <Toast ref={toast} />
             <div className="flex flex-column align-items-center justify-content-center">
                 <img src={`/layout/images/logo-simple.png`} alt="Cies logo" className="mb-5 w-6rem flex-shrink-0" />
                 <div style={{ borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(255, 165, 0, 0) 40%)' }}>
@@ -65,7 +72,7 @@ const LoginPage = () => {
                             <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">
                                 Contraseña
                             </label>
-                            <Password inputid="password1" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={15}></Password>
+                            <Password inputid="password1" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={18}></Password>
                             <div className="text-center mb-5">
                                 <Link href="/auth/register">
                                     <span className="font-medium no-underline ml-2 text-right cursor-pointer" style={{ color: 'var(--primary-color)' }}>

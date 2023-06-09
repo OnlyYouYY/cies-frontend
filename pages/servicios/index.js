@@ -15,6 +15,9 @@ import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, el
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { use, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -22,6 +25,25 @@ import * as XLSX from 'xlsx';
 
 const Servicios = () => {
 
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
 
     let emptyService = {
         id: 0,
@@ -520,7 +542,7 @@ const Servicios = () => {
                     <Dialog visible={deleteServicesDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteServicesDialogFooter} onHide={hideDeleteServicesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {service && <span>Esta seguro de dar de baja los siguiente servicios seleccionados?</span>}
+                            {service && <span>Esta seguro de dar de baja los siguientes servicios seleccionados?</span>}
                         </div>
                     </Dialog>
 

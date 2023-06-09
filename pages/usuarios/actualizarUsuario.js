@@ -10,8 +10,32 @@ import { actualizar, mostrarUsuarios } from "../../services/apiUsuarios";
 import { confirmDialog } from "primereact/confirmdialog";
 import { deleteUsuario } from "../../services/apiUsuarios";
 import { Dialog } from "primereact/dialog";
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 const Usuarios = () => {
+
+  const session = getSession();
+  const router = useRouter();
+
+  const rolesPermitidos = ['administrador'];
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const rolUsuarioEncriptado = localStorage.getItem('userRole');
+      if (session == null || rolUsuarioEncriptado == null) {
+        router.replace('/pages/notfound');
+        return;
+      }
+      const rolUsuario = decryptData(rolUsuarioEncriptado);
+      if (!rolesPermitidos.includes(rolUsuario)) {
+        router.replace('/pages/notfound');
+        return;
+      }
+    }
+  });
+
   const [usuarios, setUsuarios] = useState([]);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -150,10 +174,10 @@ const Usuarios = () => {
   );
 
   const opcionesRol = [
-    { label: "Administrador", value: "Administrador" },
-    { label: "Recepcionista", value: "Recepcionista" },
-    { label: "Médico", value: "Médico" },
-    { label: "Farmacéutico", value: "Farmacéutico" },
+    { label: "Administrador", value: "administrador" },
+    { label: "Recepcionista", value: "recepcionista" },
+    { label: "Médico", value: "medico" },
+    { label: "Farmacéutico", value: "farmaceutico" },
   ];
 
   return (

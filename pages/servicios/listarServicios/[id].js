@@ -5,12 +5,31 @@ import { Button } from 'primereact/button';
 import { Image } from 'primereact/image';
 import { mostrarServiciosID } from '../../../services/apiService';
 import 'primeflex/primeflex.css';
+import { getSession } from '../../../utils/session';
+import { decryptData } from '../../../services/crypto';
 
 const CardBoxServicios = () => {
 
+    const session = getSession();
+    const router = useRouter();
 
+    const rolesPermitidos = ['administrador', 'recepcionista', 'medico'];
 
-    const router = useRouter()
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
+
     const { id } = router.query
 
     const [servicios, setServicios] = useState([]);

@@ -7,9 +7,32 @@ import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { listarMedicamentos,registrar} from '../../services/apiVentas';
 import NuevoProducto from '../farmproductos/nuevoProducto';
-
+import { useRouter } from 'next/router';
+import { getSession } from '../../utils/session';
+import { decryptData } from '../../services/crypto';
 
 export const NuevaVenta = () => {
+
+    const session = getSession();
+    const router = useRouter();
+
+    const rolesPermitidos = ['administrador', 'farmaceutico'];
+
+    useEffect(()=>{
+        if (typeof window !== 'undefined') {
+            const rolUsuarioEncriptado = localStorage.getItem('userRole');
+            if (session == null || rolUsuarioEncriptado == null) {
+                router.replace('/pages/notfound');
+                return;
+            }
+            const rolUsuario = decryptData(rolUsuarioEncriptado);
+            if (!rolesPermitidos.includes(rolUsuario)) {
+                router.replace('/pages/notfound');
+                return;
+            }
+        }
+    });
+
     let emptySell = {
         cantidad_vendida: 0,
         fecha_venta: null,

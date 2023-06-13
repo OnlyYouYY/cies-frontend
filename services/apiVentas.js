@@ -67,3 +67,45 @@ export async function eliminarVarios(ids){
         throw error;
     }
 }
+
+//Estadisticas
+
+export async function mostrarTotalVentas(){
+    try {
+        const response = await axios.get(`${BASE_URL}/ventas/ventaTotal`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+export async function mostrarVentasPorMedicamento(){
+    try {
+        const response = await axios.get(`${BASE_URL}/ventas/ventaMedicamento`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+export async function mostrarMedicamentoMasVendido(){
+    try {
+        const response = await axios.get(`${BASE_URL}/ventas/ventaMedicamentoMasVendido`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+export async function mostrarPromedioVentasMes(){
+    try {
+        const response = await axios.get(`${BASE_URL}/ventas/ventasPromedioMes`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}

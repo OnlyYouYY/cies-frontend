@@ -208,3 +208,56 @@ export async function eliminarFicha(id) {
         throw error;
     }
 }
+
+//Estadisticas
+
+export async function mostrarFichasServicio(id_categoria) {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/conteoFichasServicio/${id_categoria}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarFichasMasSolicitadas() {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/conteoFichasTotal`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarFichasTotales() {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/conteoFichasTotalTabla`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarPacientesTotal() {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/conteoPacientes`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+export async function mostrarVentasPorMes() {
+    try {
+        const response = await axios.get(`${BASE_URL}/servicios/conteoVentasPorMes`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}

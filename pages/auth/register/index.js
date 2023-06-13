@@ -36,6 +36,7 @@ const RegisterPage = () => {
         { name: 'Farmaceutico', value: 'farmaceutico' }
     ];
 
+
     const handlePasswordChange = (event) => {
         setContrasenia(event.target.value);
     };
@@ -62,8 +63,16 @@ const RegisterPage = () => {
             toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
             return;
         }
+
+        let estadoMedico;
+        if (rol === 'medico') {
+            estadoMedico = 'No registrado';
+        } else {
+            estadoMedico = 'Otro';
+        }
+
         try {
-            const response = await register(nombres, apellidos, correo, contrasenia, rol);
+            const response = await register(nombres, apellidos, correo, contrasenia, rol, estadoMedico);
             console.log(response);
             if (typeof window !== 'undefined') {
                 window.location.replace('../auth/login');
@@ -116,7 +125,7 @@ const RegisterPage = () => {
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Tipo de acceso
                             </label>
-                            <Dropdown id="state" value={rol} onChange={(event) => setDropdownItem(event.target.value)} options={dropdownItems} optionLabel="name" placeholder="Seleccionar" className="w-full md:w-30rem mb-5"></Dropdown>
+                            <Dropdown id="state" value={rol} onChange={(event) => setDropdownItem(event.value)} options={dropdownItems} optionLabel="name" placeholder="Seleccionar" className="w-full md:w-30rem mb-5"></Dropdown>
                             <Button label="Registrar" className="block w-full p-3 text-xl bg-orange-400" type='submit'></Button>
                             <div className="block text-center mb-5 mt-3">
                                 <span>Espera la confirmacion por correo electronico para acceder.</span>

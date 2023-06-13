@@ -3,7 +3,6 @@ import { mostrarUsuarios } from "../../services/apiUsuarios";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
-import { filtrarUsuarios } from "../../services/apiUsuarios";
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';

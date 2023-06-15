@@ -12,7 +12,7 @@ import { Tag } from 'primereact/tag';
 import { mostrarUsuariosMedicos, addMedicos, getMedicoID, getHorariosID, addHorarioMedico } from "../../services/apiUsuarios";
 import { listarCategorias, mostrarServiciosID } from '../../services/apiService';
 
-export default function PaginatorBasicDemo() {
+export default function MedicoNuevo() {
 
     let emptyMedico = {
         id: 0,

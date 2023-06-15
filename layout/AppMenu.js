@@ -25,11 +25,9 @@ const AppMenu = () => {
                 {
                     label: 'Pacientes',
                     items: [
-                        //{ label: 'Prueba Menu', icon: 'pi pi-fw pi-id-card', to: '/uikit/input' },
                         { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus', to: '/pacientes/nuevoPaciente' },
                         { label: 'Actualizar pacientes', icon: 'pi pi-fw pi-pencil', to: '/pacientes/actualizarPaciente' },
-                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open' },
-                        { label: 'Consulta medica', icon: 'pi pi-fw pi-heart' },
+                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open', to: '/pacientes/historiaClinica' },
                         { label: 'Estadisticas de pacientes', icon: 'pi pi-fw pi-file-o', to: '/estadisticas/indexEstadisticasPacientes' }
                     ]
                 },
@@ -100,7 +98,6 @@ const AppMenu = () => {
                     ]
 
                 },
-
                 {
                     label: 'Administración',
                     items: [
@@ -113,11 +110,11 @@ const AppMenu = () => {
                                 { label: 'Listar usuarios', icon: 'pi pi-fw pi-list', to: '/usuarios/listarUsuario' },
                             ]
                         },
-                        { label: 'Medicos', icon: 'pi pi-fw pi-chart-bar', to: '/usuarios/registrarMedico' },
+                        { label: 'Generar informes', icon: 'pi pi-fw pi-file-import' },
+                        { label: 'Gestion de Medicos', icon: 'pi pi-fw pi-chart-bar', to: '/usuarios/registrarMedico' },
                         { label: 'Analitica de datos', icon: 'pi pi-fw pi-chart-bar', to: '/estadisticas/dashboard' },
                         { label: 'Configuración del sistema', icon: 'pi pi-fw pi-cog' }
                     ]
-
                 }],
             medico: [
                 {
@@ -127,9 +124,8 @@ const AppMenu = () => {
                 {
                     label: 'Pacientes',
                     items: [
-                        { label: 'Ver pacientes', icon: 'pi pi-fw pi-folder-open' },
-                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open' },
-                        { label: 'Consulta medica', icon: 'pi pi-fw pi-heart' },
+                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open', to: '/pacientes/historiaClinica'},
+                        { label: 'Consulta medica', icon: 'pi pi-fw pi-heart', to: '/usuarios/consultaMedica' },
                     ]
                 },
                 {
@@ -143,7 +139,6 @@ const AppMenu = () => {
                     items: [
                         { label: 'Ver medicamentos disponibles', icon: 'pi pi-fw pi-list', to: '/farmproductos/listarProductos' },
                     ]
-
                 }
             ],
             recepcionista: [
@@ -156,9 +151,7 @@ const AppMenu = () => {
                     items: [
                         { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus', to: '/pacientes/nuevoPaciente' },
                         { label: 'Actualizar pacientes', icon: 'pi pi-fw pi-pencil', to: '/pacientes/actualizarPaciente' },
-                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open' },
-                        { label: 'Consulta medica', icon: 'pi pi-fw pi-heart' },
-                        { label: 'Estadisticas de pacientes', icon: 'pi pi-fw pi-file-o', to: '/estadisticas/indexEstadisticasPacientes' }
+                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open', to: '/pacientes/historiaClinica' },
                     ]
                 },
                 {
@@ -166,7 +159,7 @@ const AppMenu = () => {
                     items: [
                         { label: 'Ver servicios', icon: 'pi pi-fw pi-list', to: '/servicios/listarCategorias' },
                         { label: 'Registro de fichas', icon: 'pi pi-fw pi-calendar', to: '/servicios/fichas/nuevaCita' },
-                        { label: 'Listado de fichas', icon: 'pi pi-fw pi-search' },
+                        { label: 'Listado de fichas', icon: 'pi pi-fw pi-search', to: '/servicios/fichas/listarFichas' },
                     ]
 
                 },
@@ -187,7 +180,6 @@ const AppMenu = () => {
                     label: 'Pacientes',
                     items: [
                         { label: 'Ver pacientes', icon: 'pi pi-fw pi-folder-open' },
-                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open' },
                     ]
                 },
                 {

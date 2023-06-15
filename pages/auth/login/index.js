@@ -34,6 +34,8 @@ const LoginPage = () => {
             setSession(response.token);
             const userData = response.usuario[0];
             localStorage.setItem('userData', JSON.stringify(userData));
+            const encryptedUserID = encryptData(userData.id);
+            localStorage.setItem('userID', encryptedUserID);
             const encryptedUserRole = encryptData(userData.rol);
             localStorage.setItem('userRole', encryptedUserRole);
             router.push('../../');

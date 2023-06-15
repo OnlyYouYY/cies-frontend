@@ -13,7 +13,7 @@ const CardBox = () => {
     const session = getSession();
     const router = useRouter();
 
-    const rolesPermitidos = ['administrador', 'farmaceutico'];
+    const rolesPermitidos = ['administrador', 'farmaceutico', 'medico', 'recepcionista'];
 
     useEffect(()=>{
         if (typeof window !== 'undefined') {

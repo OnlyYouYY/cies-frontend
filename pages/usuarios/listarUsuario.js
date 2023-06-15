@@ -193,9 +193,8 @@ const App = () => {
     <div className="card">
       <div className="container">
         <div className="header">
-          <h1 >Listar de Usuarios</h1>
+          <h5 >Lista de Usuarios</h5>
         </div>
-        <br />
 
         <div className="search-bar" style={{ display: 'inline-block', marginRight: '1px' }}>
           <span className="p-input-icon-left">
@@ -207,7 +206,9 @@ const App = () => {
             />
           </span>
         </div>
+        
         <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} style={{ float: 'right' }} />
+
         <DataTable
 
           value={filtrarUsuariosTabla(usuarios)}

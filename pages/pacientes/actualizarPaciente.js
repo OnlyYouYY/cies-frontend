@@ -474,7 +474,6 @@ const Pacientes = () => {
                         responsiveLayout="scroll"
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
-                        <Column field="code" header="ID" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="nombres" header="Nombre" sortable body={nombresBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="apellidos" header="Apellidos" sortable body={apellidosBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="fecha_nacimiento" header="FechaNacimiento" sortable body={fechaNacimientoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
@@ -518,12 +517,7 @@ const Pacientes = () => {
                             )}
                         </div>
 
-                        {/*
-                        <div className="field">
-                            <label htmlFor="fecha_nacimiento">Fecha de nacimiento del paciente</label>
-                            <InputText id="fecha_nacimiento" name="fecha_nacimiento" value={paciente.fecha_nacimiento} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.fecha_nacimiento })} />
-                            {submitted && !paciente.fecha_nacimiento && <small className="p-invalid">La fecha de nacimiento es requerido.</small>}
-                        </div>*/}
+                        
 
                         <div className="field">
                             <label htmlFor="sexo">Genero del paciente</label>

@@ -108,6 +108,7 @@ const AppMenu = () => {
                                 { label: 'Agregar un usuario', icon: 'pi pi-fw pi-plus', to: '/usuarios/nuevoUsuario' },
                                 { label: 'Actualizar usuario', icon: 'pi pi-fw pi-pencil', to: '/usuarios/actualizarUsuario' },
                                 { label: 'Listar usuarios', icon: 'pi pi-fw pi-list', to: '/usuarios/listarUsuario' },
+                                { label: 'Habilitar/Deshabilitar', icon: 'pi pi-fw pi-check', to: '/usuarios/habilitarCuentas' },
                             ]
                         },
                         { label: 'Generar informes', icon: 'pi pi-fw pi-file-import' },

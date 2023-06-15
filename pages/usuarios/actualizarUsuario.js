@@ -182,8 +182,8 @@ const Usuarios = () => {
 
   return (
     <div className="card">
-      <h3>Actualizar Usuario</h3>
-      <h5>Seleccione al usuario que desea editar o eliminar</h5>
+      <h5>Actualizar Usuario</h5>
+      <span>Seleccione al usuario que desea editar o eliminar</span>
       <Toast ref={toast} />
       <DataTable value={usuarios} className="p-datatable-striped">
         <Column field="nombres" header="Nombres" />

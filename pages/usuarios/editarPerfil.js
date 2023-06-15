@@ -7,6 +7,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Card } from 'primereact/card';
 import { FileUpload } from 'primereact/fileupload';
 import { useRouter } from 'next/router';
+import { Password } from 'primereact/password';
 import { getSession } from '../../utils/session';
 import { decryptData } from '../../services/crypto';
 
@@ -120,130 +121,122 @@ const PerfilUsuario = ({ usuarioId }) => {
   };
 
   return (
-    <div className="p-grid">
-      <div className="p-col-12 p-md-6">
-        <h2 className='card'>EDITAR PERFIL DE USUARIO</h2>
-        <Card title="Perfil de Usuario" className="card-form" style={{ width: '50%', float: 'left', marginTop: '35px' }}>
-          <div className="p-mb-3">
-            <label htmlFor="nombres">Nombre:   </label>
-            <InputText
-              id="nombres"
-              value={nombres}
-              onChange={(e) => setNombres(e.target.value)}
-              disabled={!editing}
-            />
-          </div>
-          <br />
-          <div className="p-mb-3">
-            <label htmlFor="apellidos">Apellido:   </label>
-            <InputText
-              id="apellidos"
-              value={apellidos}
-              onChange={(e) => setApellidos(e.target.value)}
-              disabled={!editing}
-            />
-          </div>
-          <br />
-          <div className="p-mb-3">
-            <label htmlFor="correo">Correo electrónico:   </label>
-            <InputText
-              id="correo"
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              disabled={!editing}
-            />
-          </div>
-          <br />
-          <div className="p-mb-3">
-            <label htmlFor="contrasenia">Contraseña:   </label>
-            <InputText
-              id="contrasenia"
-              value={contrasenia}
-              onChange={(e) => setContrasenia(e.target.value)}
-              disabled={!editing}
-            />
-          </div>
-          <br />
-
-          {!editing && (
-            <Button label="Editar" icon="pi pi-pencil" onClick={() => setEditing(true)} />
-          )}
-          {editing && (
-            <div>
-              <Button
-                label="Guardar"
-                icon={loading ? 'pi pi-spin pi-spinner' : 'pi pi-check'}
-                onClick={guardarUsuario}
-                disabled={loading}
-              />
-              <Button
-                label="Cancelar"
-                icon="pi pi-times"
-                className="p-button-secondary"
-                onClick={() => {
-                  setEditing(false);
-                  cargarUsuario(usuarioId);
-                }}
-                disabled={loading}
-              />
-            </div>
-          )}
-        </Card>
-      </div>
-      <br />
-      <br />
-      <div className="p-col-12 p-md-6 p-lg-4">
-        <Card title="Subir Imagen" className="card-form" style={{ width: '45%', marginLeft: '50%', position: 'left' }}>
-          <h6>Foto de Perfil</h6>
-          <FileUpload
-            key={fileKey}
-            mode="basic"
-            chooseLabel="Seleccionar"
-            customUpload
-            uploadHandler={uploadFile}
-            onSelect={onFileSelect}
-            style={{ display: 'inline-block', marginRight: '10px' }}
-
-
-          />
-          <br />
-
-          {selectedFile && (
-            <div className="p-mt-2" style={{ float: 'right' }}>
-              <Button
-                label="Cancelar"
-                icon="pi pi-times"
-                className="p-button-primary"
-                onClick={cancelarSubida}
-
-
-              />
-            </div>
-          )}
-
-          <div className="container">
-            {selectedFile && (
-              <div>
-                <img
-                  src={URL.createObjectURL(selectedFile)}
-                  alt="Imagen seleccionada"
+    <div className="grid">
+      <div className="col-12 md:col-12">
+        <div className='card p-fluid'>
+          <h5 className='card'>Perfil de usuario</h5>
+          <div className="grid">
+            <div className="col-12 md:col-6" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className="field">
+                <h5>Foto de Perfil</h5>
+              </div>
+              <div style={{ width: '250px', height: '250px' }}>
+                <div
                   style={{
-                    marginTop: '10px',
-                    maxWidth: '100%',
-                    height: 'auto',
-                    maxHeight: '250px',
                     borderRadius: '50%',
-
-
+                    width: '100%',
+                    height: '100%',
+                    backgroundImage: `url(${selectedFile ? URL.createObjectURL(selectedFile) : 'https://www.softzone.es/app/uploads-softzone.es/2018/04/guest.png'})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
                   }}
+                >
+                </div>
+              </div>
+
+              {selectedFile && (
+                <div style={{ marginTop: '20px' }}>
+                  <Button
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    onClick={cancelarSubida}
+                    style={{ width: 'auto' }}
+                  />
+                </div>
+              )}
+              <div style={{ marginTop: '20px' }}>
+                <FileUpload
+                  key={fileKey}
+                  mode="basic"
+                  chooseLabel="Seleccionar"
+                  customUpload
+                  uploadHandler={uploadFile}
+                  onSelect={onFileSelect}
+                  style={{ marginBottom: '20px' }}
+                />
+              </div>
+            </div>
+
+
+            <div className="col-12 md:col-6">
+              <div className="field">
+                <label htmlFor="nombres">Nombres</label>
+                <InputText
+                  id="nombres"
+                  value={nombres}
+                  onChange={(e) => setNombres(e.target.value)}
+                  disabled={!editing}
                 />
               </div>
 
-            )}
+              <div className="field">
+                <label htmlFor="apellidos">Apellidos</label>
+                <InputText
+                  id="apellidos"
+                  value={apellidos}
+                  onChange={(e) => setApellidos(e.target.value)}
+                  disabled={!editing}
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="correo">Correo electrónico</label>
+                <InputText
+                  id="correo"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                  disabled={!editing}
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="contrasenia">Contraseña</label>
+                <Password id="contrasenia" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)} toggleMask disabled={!editing} />
+              </div>
+
+              {!editing && (
+                <div className="card flex flex-wrap justify-content-center gap-3">
+                  <Button label="Editar datos" icon="pi pi-pencil" onClick={() => setEditing(true)} className="p-mt-3" style={{ width: 'auto' }} />
+                </div>
+              )}
+              {editing && (
+                <div className="card flex flex-wrap justify-content-center gap-3">
+                  <Button
+                    label="Guardar"
+                    icon={loading ? 'pi pi-spin pi-spinner' : 'pi pi-check'}
+                    className="p-mt-3" 
+                    style={{ width: 'auto' }}
+                    onClick={guardarUsuario}
+                    disabled={loading}
+                  />
+                  <Button
+                    label="Cancelar"
+                    icon="pi pi-times"
+                    className="p-mt-3" 
+                    style={{ width: 'auto' }}
+                    onClick={() => {
+                      setEditing(false);
+                      cargarUsuario(usuarioId);
+                    }}
+                    disabled={loading}
+                  />
+                </div>
+              )}
+            </div>
+
           </div>
-
-
-        </Card>
+        </div>
       </div>
     </div>
   );

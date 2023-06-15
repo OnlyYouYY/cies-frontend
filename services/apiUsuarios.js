@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
+const BASE_URL = 'http://localhost:4000/api';
 
 export async function addUsuarios(nombres, apellidos, correo, contrasenia, rol) {
     try {
@@ -38,6 +38,24 @@ export async function actualizar(id, nombres, apellidos, correo, contrasenia, ro
     }
 }
 
+export async function actualizarEstadoHabilitado(id) {
+    try {
+        const response = await axios.put(`${BASE_URL}/usuarios/estadoHabilitado/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function actualizarEstadoDeshabilitado(id) {
+    try {
+        const response = await axios.put(`${BASE_URL}/usuarios/estadoDeshabilitado/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function deleteUsuario(id) {
     try {
         const response = await axios.put(`${BASE_URL}/usuarios/delete/${id}`);
@@ -51,6 +69,15 @@ export async function deleteUsuario(id) {
 export async function mostrarUsuarios() {
     try {
         const response = await axios.get(`${BASE_URL}/usuarios/`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarUsuariosEstado() {
+    try {
+        const response = await axios.get(`${BASE_URL}/usuarios/usuariosEstado`);
         return response.data;
     } catch (error) {
         throw error;

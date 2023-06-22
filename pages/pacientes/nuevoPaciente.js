@@ -212,7 +212,7 @@ export const NuevoPaciente = () => {
                     <div className="grid">
                         <div className="col-12 md:col-6">
                             <div className="field">
-                                <label htmlFor="ci">Documento de identidad</label>
+                                <label htmlFor="ci">Documento de identidad y lugar expedido</label>
                                 <InputText id="ci" name="ci" value={paciente.ci} onChange={(e) => setPaciente({ ...paciente, ci: e.target.value })} placeholder="Escriba el carnet de identidad del paciente" />
                             </div>
                         </div>
@@ -277,7 +277,7 @@ export const NuevoPaciente = () => {
                                     <Button
                                         label="Generar Usuario"
                                         onClick={generarCredenciales}
-                                        className="p-mt-3"
+                                        className="p-mt-3 bg-orange-500"
                                         style={{ width: 'auto' }}
                                         disabled={!paciente.nombres || !paciente.apellidos || !paciente.ci}
                                     />
@@ -300,7 +300,7 @@ export const NuevoPaciente = () => {
                         <Button
                             label="Registrar paciente"
                             onClick={handleSubmit}
-                            className="p-mt-3"
+                            className="p-mt-3 bg-orange-500"
                             style={{ width: 'auto' }}
                             disabled={!camposRequeridosLlenos()}
                         />

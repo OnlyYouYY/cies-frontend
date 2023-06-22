@@ -26,9 +26,9 @@ export async function registrarHistoriaClinica(id_paciente, motivo_consulta, enf
 
 
 
-export async function actualizar(id, nombres, apellidos, fecha_nacimiento, sexo, telefono, correo_electronico, id_direccion, usuario, contrasenia) {
+export async function actualizar(id, nombres, apellidos, ci, fecha_nacimiento, sexo, telefono, correo_electronico, pais, ciudad, provincia, zona, calle, usuario, contrasenia) {
     try {
-        const response = await axios.put(`${BASE_URL}/pacientes/actualizar/${id}`, { nombres, apellidos, fecha_nacimiento, sexo, telefono, correo_electronico, id_direccion, usuario, contrasenia });
+        const response = await axios.put(`${BASE_URL}/pacientes/actualizar/${id}`, { nombres, apellidos, ci, fecha_nacimiento, sexo, telefono, correo_electronico, pais, ciudad, provincia, zona, calle, usuario, contrasenia });
         return response.data;
     }
     catch (error) {
@@ -58,17 +58,6 @@ export async function eliminarVarios(ids) {
     }
 }
 
-
-export async function listarDirecciones() {
-    try {
-        const response = await axios.get(`${BASE_URL}/pacientes/direccion`);
-        return response.data;
-    }
-    catch (error) {
-        throw error;
-    }
-}
-
 export async function mostrarPacientes() {
     try {
         const response = await axios.get(`${BASE_URL}/pacientes/pacientes`);
@@ -82,6 +71,16 @@ export async function mostrarPacientes() {
 export async function mostrarHistoriaClinica(id) {
     try {
         const response = await axios.get(`${BASE_URL}/pacientes/historiaClinica/${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function mostrarEvolucionPaciente(id) {
+    try {
+        const response = await axios.get(`${BASE_URL}/pacientes/evolucionPaciente/${id}`);
         return response.data;
     }
     catch (error) {
@@ -112,6 +111,16 @@ export async function mostrarFichasMedico(id, fecha) {
 export async function finalizarFicha(id) {
     try {
         const response = await axios.put(`${BASE_URL}/pacientes/finalizarFicha/${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function insertarEvolucionMedica(id, id_paciente, nota_evolucion, peso, altura, imc, tratamiento, fecha_evolucion) {
+    try {
+        const response = await axios.post(`${BASE_URL}/pacientes/evolucionMedica`, { id, id_paciente, nota_evolucion, peso, altura, imc, tratamiento, fecha_evolucion });
         return response.data;
     }
     catch (error) {

@@ -440,7 +440,7 @@ export default function ReservaCitas() {
                         <Button
                             label="Reservar ficha"
                             onClick={añadirFicha}
-                            className="p-mt-3"
+                            className="p-mt-3 bg-orange-500"
                             style={{ width: 'auto' }}
                             disabled={!selectedPaciente || !medico || !servicio || !medicosDelDia.length}
                         />

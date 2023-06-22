@@ -438,7 +438,7 @@ export default function ReservaCitas() {
                                                 <div className="card flex flex-wrap justify-content-end gap-3">
                                                     <Button
                                                         label="Registrar"
-                                                        className="p-mt-3"
+                                                        className="p-mt-3 bg-orange-500"
                                                         style={{ width: 'auto' }}
                                                         onClick={añadirHistoriaClinica}
                                                         disabled={!camposRequeridosLlenos()}
@@ -577,7 +577,7 @@ export default function ReservaCitas() {
                                                     <p>{error ? error : 'El paciente no tiene historia clinica'}</p>
                                                     <Button
                                                         label="Crear historia medica"
-                                                        className="p-mt-3"
+                                                        className="p-mt-3 bg-orange-500"
                                                         style={{ width: 'auto' }}
                                                         onClick={() => setShowForm(true)}
                                                         disabled={!selectedPaciente}

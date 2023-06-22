@@ -60,7 +60,7 @@ const AppMenuitem = (props) => {
     );
 
     return (
-        <li className={classNames({ 'layout-root-menuitem': props.root, 'active-menuitem': active })}>
+        <li className={classNames({ 'layout-root-menuitem': props.root, 'active-menuitem': active })} >
             {props.root && item.visible !== false && <div className="layout-menuitem-root-text">{item.label}</div>}
             {(!item.to || item.items) && item.visible !== false ? (
                 <a href={item.url} onClick={(e) => itemClick(e)} className={classNames(item.class, 'p-ripple')} target={item.target} tabIndex="0">

@@ -1,6 +1,7 @@
 import { Button } from 'primereact/button';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import Link from 'next/link'
 import { useRouter } from 'next/router';
 import { getSession } from '../utils/session';
 import { decryptData } from '../services/crypto';
@@ -12,7 +13,7 @@ const Dashboard = () => {
 
     const rolesPermitidos = ['administrador', 'recepcionista', 'farmaceutico', 'medico'];
 
-    useEffect(()=>{
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const rolUsuarioEncriptado = localStorage.getItem('userRole');
             if (session == null || rolUsuarioEncriptado == null) {
@@ -36,6 +37,7 @@ const Dashboard = () => {
                     style={{
                         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)),url(${logo})`,
                         backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'cover',
                         width: '100%',
                         clipPath: 'ellipse(150% 87% at 93% 13%)'
                     }}
@@ -44,8 +46,10 @@ const Dashboard = () => {
                         <h1 className="text-7xl font-light text-white line-height-2">
                             <span className="font-bold block">CIES REGIONAL</span>La Paz - Bolivia
                         </h1>
+                        <Link href={'/client'}>
+                            <Button label="Ver mas" rounded className="text-xl border-none mt-3 font-normal line-height-3 px-3 text-white bg-orange-500"></Button>
+                        </Link>
 
-                        <Button label="Ver mas" rounded className="text-xl border-none mt-3 font-normal line-height-3 px-3 text-white bg-orange-400"></Button>
                     </div>
                     <div className="flex justify-content-center md:justify-content-end mt-8">
                         <img src="/demo/images/assets/ciesBlanco.png" alt="Hero Image" className="w-9 md:w-auto" />
@@ -57,7 +61,7 @@ const Dashboard = () => {
                 <div id="highlights" className="py-4 px-4 lg:px-8 mx-0 my-6 lg:mx-8">
                     <div className="text-center">
                         <h2 className="text-900 font-normal mb-2">Novedades</h2>
-                        <span className="text-600 text-2xl">Version 0.5.0</span>
+                        <span className="text-600 text-2xl">Version 1.0.0</span>
                     </div>
 
                     <div className="grid my-8 pt-2 md:pt-8">

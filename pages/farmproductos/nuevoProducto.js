@@ -10,65 +10,50 @@ import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { listarCategorias,listarProveedores,registrar} from '../../services/apiProductos';
-import { useRouter } from 'next/router';
-import { getSession } from '../../utils/session';
-import { decryptData } from '../../services/crypto';
+
 
 export const NuevoProducto = () => {
-
-    const session = getSession();
-    const router = useRouter();
-
-    const rolesPermitidos = ['administrador', 'farmaceutico'];
-
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            const rolUsuarioEncriptado = localStorage.getItem('userRole');
-            if (session == null || rolUsuarioEncriptado == null) {
-                router.replace('/pages/notfound');
-                return;
-            }
-            const rolUsuario = decryptData(rolUsuarioEncriptado);
-            if (!rolesPermitidos.includes(rolUsuario)) {
-                router.replace('/pages/notfound');
-                return;
-            }
-        }
-    });
-
     let emptyService = {
         nombre_medicamento: '',
         precio: 0,
         cantidad: 0,
         fechacaducidad: null
     };
+
+    let today = new Date();
     
     const toast = useRef(null);
     const fileUploadRef = useRef(null);
     
     const [categorias, setCategorias] = useState([]);
+    const [categoria, setCategoria] = useState([]);
+    const [categoriasDropdown, setCategoriasDropdown] = useState([]);
+
     const [proveedores, setProveedores] = useState([]);
+    const [proveedor, setProveedor] = useState(null);
+    const [proveedoresDropdown, setProveedoresDropdown] = useState([]);
+    
     const [producto, setProducto] = useState(emptyService);
-    const [listboxValueP, setListboxValueP] = useState(null);
-    const [listboxValueC, setListboxValueC] = useState(null);
     const [submitted, setSubmitted] = useState(false);
 
     //Registrar Nuevo Producto
     async function registrarProducto() {
         if (producto.nombre_medicamento.trim() !== "" &&
-            listboxValueP != null &&
-            listboxValueC != null &&
+            proveedor &&
+            categoria  &&
             producto.precio > 0 &&
             producto.cantidad > 0 &&
             producto.fechacaducidad ) { 
             try {
-                const response = await registrar(producto.nombre_medicamento, listboxValueP.idp ,listboxValueC.idc,producto.precio_unitario, producto.cantidad, producto.fechacaducidad);
+                const response = await registrar(producto.nombre_medicamento,proveedor,categoria,producto.precio, producto.cantidad, formatDate(producto.fechacaducidad));
                 console.log(response);
                 toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Producto agregado', life: 3000 });
                 setProducto(emptyService);
+                setCategoria(null); 
+                setProveedor(null); 
                 fileUploadRef.current.clear();
-                setListboxValueP(null);
-                setListboxValueC(null);
+                setText('');
+                
             } catch (error) {
                 console.log(error);
             }
@@ -82,7 +67,15 @@ export const NuevoProducto = () => {
         async function obtenercatergoriasproveedores() {
             try {
                 const categoriasp = await listarProveedores();
+                console.log(categoriasp);
                 setProveedores(categoriasp);
+
+                const proveedordropdown = categoriasp.map(proveedor => ({
+                    label: proveedor.nombre_proveedor,
+                    value: proveedor.id_proveedor
+                }));
+                console.log(proveedordropdown);
+                setProveedoresDropdown(proveedordropdown);
             }
             catch (error){
                 console.log(error);
@@ -96,7 +89,14 @@ export const NuevoProducto = () => {
         async function obtenercatergoriasproductos() {
             try {
                 const categoriasc = await listarCategorias();
+                console.log(categoriasc);
                 setCategorias(categoriasc);
+
+                const categoriasdropdown = categoriasc.map(categoria=> ({
+                    label: categoria.nombre_categoria,
+                    value: categoria.id_categoria
+                }));
+                setCategoriasDropdown(categoriasdropdown);
             }
             catch (error){
                 console.log(error);
@@ -132,26 +132,40 @@ export const NuevoProducto = () => {
             fechacaducidad: e.value
         }));
     };
+    const getDefaultDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+    }
 
     return (
         <div className='grid'>
             <Toast ref={toast}></Toast>
             <div className='col-12 md:col-12'>
                 <div className='card p-fluid'>
-                    <h5>Nuevo Producto</h5>
+                    <h3>Nuevo Producto</h3>
                     <div className='field'>
-                        <label htmlFor='nombreProducto'>Nombre del Producto</label>
-                        <InputText id="nombre_medicamento" name="nombre_medicamento" value={producto.nombre_medicamento} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !producto.nombre_medicamento })} />
+                        <label htmlFor='nombreMedicamento'>Nombre del Producto</label>
+                        <InputText id="nombre_medicamento" name="nombre_medicamento" value={producto.nombre_medicamento} onChange={onInputChange} placeholder='Escriba el nombre del producto' required autoFocus className={classNames({ 'p-invalid': submitted && !producto.nombre_medicamento })} />
                         {submitted && !producto.nombre_medicamento && <small className="p-invalid">El nombre es requerido.</small>}
                     </div>
 
                     <div className="field">
-                        <label htmlFor="categoriaProveedores">Proveedores</label>
-                        <Dropdown value={listboxValueP} onChange={(e) => setListboxValueP(e.value)} filterPlaceholder='Buscar Proveedor' options={proveedores} optionLabel="nombre_proveedor" filter /> {/**chequear bien */}
+                        <label htmlFor="proveedores">Proveedores</label>
+                        <Dropdown id='proveedor_id' value={proveedor} onChange={(e) => setProveedor(e.value)} options={proveedoresDropdown} placeholder='Seleccione un Proveedor' filterPlaceholder='Buscar Proveedores' filter/>
                     </div>
                     <div className="field">
-                        <label htmlFor="categoriaProductos">Categoria Productos</label>
-                        <Dropdown value={listboxValueC} onChange={(e) => setListboxValueC(e.value)} filterPlaceholder='Buscar categoria' options={categorias} optionLabel="nombre_categoria" filter />
+                        <label htmlFor="categoria">Categoria Productos</label>
+                        <Dropdown id='categoria_id' value={categoria} onChange={(e) => setCategoria(e.value)} options={categoriasDropdown} placeholder='Seleccione Categoria del Producto' filterPlaceholder='Buscar Catergoria' filter/>
                     </div>
 
                     <div className="field">
@@ -165,28 +179,33 @@ export const NuevoProducto = () => {
                     </div>
 
 
-                    <div className="field" col>
+                    <div className="field">
                         <label htmlFor="fecha">Fecha de Caducidad</label>
-                        <Calendar id="fecha" name="fechacaducidad" value={producto.fechacaducidad} onChange={onDateChange} showIcon />
+                        <Calendar id="fecha_caducidad" name="fechacaducidad" value={producto.fechacaducidad} onChange={onDateChange} dateFormat="yy-mm-dd" placeholder='Seleccione la fecha de caducidad' showIcon minDate={today}/>
                     </div>
 
-
                     <div className="field">
-                        <label htmlFor="imagen">Opciones</label>
-                        <span className="p-buttonset flex">
+                        <div className="card flex flex-wrap justify-content-end gap-3">
                             <Button
-                                label="Guardar"
-                                icon="pi pi-check"
+                                label="Registrar"
+                                className="p-mt-3 bg-orange-500"
+                                style={{ width: 'auto' }}
                                 onClick={handleSubmit}
                                 disabled={!setProducto}
                             />
-                            <Button label="Limpiar" icon="pi pi-times" onClick={() => {
-                                setProducto(emptyService);
-                                setListboxValueC(null);
-                            }} />
-                        </span>
+                            <Button
+                                icon="pi pi-refresh"
+                                className="p-button-outlined p-button-danger p-mt-3"
+                                style={{ width: 'auto' }}
+                                onClick={() => {
+                                    setProducto(emptyService);
+                                    setCategoria(null); 
+                                    setProveedor(null); 
+                                }}
+                                label="Limpiar"
+                            />
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

@@ -1,19 +1,13 @@
+import React, { useEffect, useState, useRef, use } from 'react';
+import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
-import { InputNumber } from 'primereact/inputnumber';
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import { Toast } from 'primereact/toast';
-import { Calendar } from 'primereact/calendar';
-import { listarVentas,listarMedicamentos, actualizar, eliminar, eliminarVarios } from '../../services/apiVentas';
-import React, { use, useEffect, useRef, useState } from 'react';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import { listarNoVentas,actualizar, eliminar, eliminarVarios } from '../../services/apiVentas';
 
-const Ventas = () => {
+export const Inactivos = () => {
     let emptySale = {
         id_ventas: 0,
         id_medicamento:0,
@@ -27,7 +21,7 @@ const Ventas = () => {
 
     const [medicamentos, setMedicamentos] = useState([]);
     
-    const [medicamentosDropdown, setMedicamentosDropdown] = useState([]);
+
     const [ventas, setVentas] = useState([]);
     const [listboxValue, setListboxValue] = useState(null);
     const [saleUpdateDialog, setSaleUpdateDialog] = useState(false);
@@ -46,7 +40,7 @@ const Ventas = () => {
 
     const cargarVentas = async () => {
         try {
-            const venta = await listarVentas();
+            const venta = await listarNoVentas();
             setVentas(venta);
         } catch (error) {
             console.log(error);
@@ -107,15 +101,9 @@ const Ventas = () => {
     useEffect(()=>{
         async function cargarMedicamentos() {
             try {
-                const medicine = await listarMedicamentos();
-                setMedicamentos(medicine);
-
-                const medicinedropdown = medicine.map(medicina => ({
-                    label: medicina.nombre_medicamento,
-                    value: medicina.id_medicamento,
-                }));
-                console.log(medicinedropdown);
-                setMedicamentosDropdown(medicinedropdown);
+                const ventas = await listarMedicamentos();
+                console.log(ventas);
+                setMedicamentos(ventas);
             } catch (error) {
                 console.log(error);
             }
@@ -126,7 +114,7 @@ const Ventas = () => {
     useEffect(()=>{
         async function cargarVentas() {
             try {
-                const ventas = await listarVentas();
+                const ventas = await listarNoVentas();
                 console.log(ventas);
                 setVentas(ventas);
             } catch (error) {
@@ -192,26 +180,6 @@ const Ventas = () => {
         }));
     };
 
-    const onInputChange = (e) => {
-        const { name, value } = e.target;
-        setProduct(prevProduct => ({
-            ...prevProduct,
-            [name]: value
-        }));
-    };
-
-    function formatDate(dateString) {
-        let date = new Date(dateString);
-        let year = date.getFullYear();
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-
-        month = month < 10 ? '0' + month : month;
-        day = day < 10 ? '0' + day : day;
-
-        return `${year}/${month}/${day}`;
-    }
-
 
     const idBodyTemplate = (rowData) => {
         return (
@@ -249,7 +217,7 @@ const Ventas = () => {
         return (
             <>
                 <span className="p-column-title">Fecha Venta</span>
-                {formatDate(rowData.fecha_venta)}
+                {rowData.fecha_venta}
             </>
         );
     };
@@ -265,24 +233,15 @@ const Ventas = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" severity="info" rounded className="mr-2" onClick={() => editSale(rowData)} />
-                <Button icon="pi pi-times" severity="danger" rounded onClick={() => confirmDeleteSale(rowData)} />
+                <Button icon="pi pi-undo" severity="warning" rounded onClick={() => confirmDeleteSale(rowData)} />
             </>
         );
     };
 
-    const openNewExportar = () => {
-        setServiceDialogExportar(true);
-    };
-    const hideDialogExportar = () => {
-        setServiceDialogExportar(false);
-    };
-
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h3 className="m-0">Gestion Y Actualizacion de Ventas</h3>
-            <Button visible={false} label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedSales || !selectedSales.length} />
-            <Button visible={false} label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
+            <h3 className="m-0">Listado de Ventas Inactivas</h3>
+            <Button label="Reactivar Venta" icon="pi pi-undo" severity="warning" onClick={confirmDeleteSelected} disabled={!selectedSales || !selectedSales.length} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -290,12 +249,6 @@ const Ventas = () => {
         </div>
     );
 
-    const saleUpdateDialogFooter = (
-        <>
-            <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Guardar" icon="pi pi-check" text onClick={onSubmitActualizar} />
-        </>
-    );
     const deleteSaleDialogFooter = (
         <>
             <Button label="No" icon="pi pi-times" text onClick={hideDeleteSaleDialog} />
@@ -435,43 +388,12 @@ const Ventas = () => {
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={saleUpdateDialog} style={{ width: '450px' }} header="Editar Venta" modal className="p-fluid" footer={saleUpdateDialogFooter} onHide={hideDialog}>
-                        <div className="field">
-                            <label htmlFor="nombreMedicamento">Medicamento Disponibles</label>
-                            <Dropdown value={sale.id_medicamento} onChange={(e) => setSale({ ...sale, id_medicamento: e.target.value })} filterPlaceholder='Buscar medicamento' options={medicamentosDropdown} filter />
-                        </div>
-
-                        <div className="field">
-                            <label htmlFor="cantidad_vendida">Cantidad del Producto Vendido</label>
-                            <InputNumber id="cantidad_vendida" value={sale.cantidad_vendida} name="cantidad_vendida" onValueChange={onInputNumberChange} />
-                        </div>
-
-                        <div className="field">
-                            <label htmlFor="fecha_venta">Fecha de Registro</label>
-                            <Calendar id="fecha_venta" name="fecha_venta" value={new Date(sale.fecha_venta)} dateFormat="yy-mm-dd" onChange={onInputChange} showIcon disabled/>
-                        </div>
-
-                        <div className="field">
-                            <label htmlFor="total_venta">Total Venta del Medicamento</label>
-                            <InputNumber
-                            id="total_venta"
-                            value={sale.total_venta}
-                            name="total_venta"
-                            onValueChange={onInputNumberChange}
-                            mode='currency'
-                            currency='BOB'
-                            locale='es-BO'
-                            disabled
-                            />
-                        </div>
-                    </Dialog>
-
                     <Dialog visible={deleteSaleDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteSaleDialogFooter} onHide={hideDeleteSaleDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {sale && (
                                 <span>
-                                    Esta seguro de eliminar la siguiente venta: <b>{sale.nombre_medicamento}</b>?
+                                    Esta seguro de reactivar la siguiente venta: <b>{sale.nombre_medicamento}</b>?
                                 </span>
                             )}
                         </div>
@@ -482,19 +404,8 @@ const Ventas = () => {
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
                             {sale && 
                             <span>
-                                Esta seguro de eliminar las siguientes ventas seleccionados?
+                                Esta seguro de reactivar las siguientes ventas seleccionadas?
                             </span>}
-                        </div>
-                    </Dialog>
-
-                    <Dialog visible={serviceDialogExportar} style={{ width: '450px' }} header="Exportar" modal className="p-fluid" onHide={hideDialogExportar}>
-                        <div className="field" style={{ display: 'flex', gap: '10px' }}>
-                            <label htmlFor="formato">En que formato quiere el reporte</label>
-                        </div>
-                        
-                        <div className="field" style={{ display: 'flex', gap: '10px' }}>
-                            <Button label="Exportar en EXCEL" icon="pi pi-upload" severity="success" onClick={exportToExcel} />
-                            <Button label="Exportar en PDF" icon="pi pi-upload" severity="danger" onClick={exportToPDF} />
                         </div>
                     </Dialog>
                 </div>
@@ -502,4 +413,4 @@ const Ventas = () => {
         </div>
     );
 };
-export default Ventas;
+export default Inactivos;

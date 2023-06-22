@@ -61,7 +61,7 @@ const CardBoxCategorias = () => {
                     <p className="p-m-0" style={{ lineHeight: '1.5' }}>Código: {categoria.codigo}</p>
 
                     <Link href={`/servicios/listarServicios/${categoria.id}`}>
-                        <Button icon="pi pi-check" label='Ver servicios' rounded></Button>
+                        <Button className='bg-orange-500' icon="pi pi-check" label='Ver servicios' rounded></Button>
                     </Link>
                 </Card>
             </div>

@@ -3,6 +3,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { InputNumber } from 'primereact/inputnumber';
+import { Dropdown } from 'primereact/dropdown';
 import { Image } from 'primereact/image';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
@@ -30,7 +31,7 @@ const Pacientes = () => {
 
     const rolesPermitidos = ['administrador', 'recepcionista'];
 
-    useEffect(()=>{
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const rolUsuarioEncriptado = localStorage.getItem('userRole');
             if (session == null || rolUsuarioEncriptado == null) {
@@ -48,13 +49,50 @@ const Pacientes = () => {
     let emptyPaciente = {
         nombres: '',
         apellidos: '',
+        ci: '',
         fecha_nacimiento: '',
         sexo: '',
         telefono: '',
         correo_electronico: '',
-        usuario:'',
-        contrasenia:'',
+        usuario: '',
+        contrasenia: '',
+        pais: '',
+        ciudad: '',
+        zona: '',
+        provincia: '',
+        calle: ''
     };
+
+    const sexoDropdown = [
+        { label: 'Masculino', value: 'Masculino' },
+        { label: 'Femenino', value: 'Femenino' },
+    ];
+
+    const provinciasDropdown = [
+        { label: 'Abel Iturralde', value: 'Abel Iturralde' },
+        { label: 'Pedro Domingo Murillo', value: 'Pedro Domingo Murillo' },
+        { label: 'Pacajes', value: 'Pacajes' },
+        { label: 'Larecaja', value: 'Larecaja' },
+        { label: 'Inquisivi', value: 'Inquisivi' },
+        { label: 'Sud Yungas', value: 'Sud Yungas' },
+        { label: 'Ingavi', value: 'Ingavi' },
+        { label: 'Muñecas', value: 'Muñecas' },
+        { label: 'Franz Tamayo', value: 'Franz Tamayo' },
+        { label: 'Aroma', value: 'Aroma' },
+        { label: 'Caranavi', value: 'Caranavi' },
+        { label: 'José Ramón Loayza', value: 'José Ramón Loayza' },
+        { label: 'Bautista Saavedra', value: 'Bautista Saavedra' },
+        { label: 'Eliodoro Camacho', value: 'Eliodoro Camacho' },
+        { label: 'Omasuyos', value: 'Omasuyos' },
+        { label: 'General José Manuel Pando', value: 'General José Manuel Pando' },
+        { label: 'Gualberto Villaroel', value: 'Gualberto Villaroel' },
+        { label: 'Nor Yungas', value: 'Nor Yungas' },
+        { label: 'Los Andes', value: 'Los Andes' },
+        { label: 'Manco Kapac', value: 'Manco Kapac' },
+    ];
+
+    const [pais, setPais] = useState('Bolivia');
+    const [ciudad, setCiudad] = useState('La Paz');
 
     const [categorias, setCategorias] = useState([]);
     const [pacientes, setPacientes] = useState([]);
@@ -85,7 +123,7 @@ const Pacientes = () => {
 
     async function actualizarPaciente() {
         try {
-            const response = await actualizar(paciente.id, paciente.nombres, paciente.apellidos, paciente.fecha_nacimiento, paciente.sexo, paciente.telefono, paciente.correo_electronico, paciente.id_direccion, paciente.usuario, paciente.contrasenia);
+            const response = await actualizar(paciente.id, paciente.nombres, paciente.apellidos, paciente.ci, paciente.fecha_nacimiento, paciente.sexo, paciente.telefono, paciente.correo_electronico, paciente.pais, paciente.ciudad, paciente.provincia, paciente.zona, paciente.calle, paciente.usuario, paciente.contrasenia);
             console.log(response);
             toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Paciente actualizado', life: 3000 });
             await cargarPacientes();
@@ -139,21 +177,6 @@ const Pacientes = () => {
         }
     }
 
-
-    useEffect(() => {
-        async function obtenerDirecciones() {
-            try {
-                const direccion = await listarDirecciones();
-                console.log(direccion)
-                setDireccion(direccion);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        obtenerDirecciones();
-    }, []);
-
-
     useEffect(() => {
         async function listarPacientes() {
             try {
@@ -168,9 +191,6 @@ const Pacientes = () => {
         listarPacientes();
     }, []);
 
-    const formatCurrency = (value) => {
-        return value.toLocaleString('es-BO', { style: 'currency', currency: 'BOB' });
-    };
 
     const openNew = () => {
         setService(emptyService);
@@ -242,7 +262,7 @@ const Pacientes = () => {
         }));
     };
 
-    
+
     const idBodyTemplate = (rowData) => {
         return (
             <>
@@ -309,8 +329,8 @@ const Pacientes = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" severity="success" rounded className="mr-2" onClick={() => editService(rowData)} />
-                <Button icon="pi pi-trash" severity="warning" rounded onClick={() => confirmDeletePaciente(rowData)} />
+                <Button icon="pi pi-pencil" severity="info" rounded className="mr-2" onClick={() => editService(rowData)} />
+                <Button icon="pi pi-times" severity="danger" rounded onClick={() => confirmDeletePaciente(rowData)} />
             </>
         );
     };
@@ -327,8 +347,8 @@ const Pacientes = () => {
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Gestion de pacientes</h5>
-            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedPacientes || !selectedPacientes.length} />
-            <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
+            <Button visible={false} label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedPacientes || !selectedPacientes.length} />
+            <Button visible={false} label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -372,7 +392,7 @@ const Pacientes = () => {
         const splitIntroText = doc.splitTextToSize(introText, doc.internal.pageSize.getWidth() - 20);
         doc.setFontSize(12);
         doc.text(splitIntroText, 10, 20);
-        
+
         const startY = doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 60;
 
         const tableColumns = [
@@ -383,17 +403,17 @@ const Pacientes = () => {
             { header: 'Telefono', dataKey: 'telefono' },
             { header: 'Correo', dataKey: 'correo_electronico' },
             //{ header: 'Ciudad', dataKey: 'ciudad' },
-          ];
-        
-          const tableData = pacientes.map(pacientes => ({
-              nombres: pacientes.nombres,
-              apellidos: pacientes.apellidos,
-              fecha_nacimiento: new Date(pacientes.fecha_nacimiento).toLocaleDateString(),
-              sexo: pacientes.sexo,
-              telefono: pacientes.telefono,
-              correo_electronico: pacientes.correo_electronico,
-              //ciudad: pacientes.ciudad
-          }));
+        ];
+
+        const tableData = pacientes.map(pacientes => ({
+            nombres: pacientes.nombres,
+            apellidos: pacientes.apellidos,
+            fecha_nacimiento: new Date(pacientes.fecha_nacimiento).toLocaleDateString(),
+            sexo: pacientes.sexo,
+            telefono: pacientes.telefono,
+            correo_electronico: pacientes.correo_electronico,
+            //ciudad: pacientes.ciudad
+        }));
 
         doc.autoTable(tableColumns, tableData, {
             startY,
@@ -406,16 +426,16 @@ const Pacientes = () => {
 
     function exportToExcel() {
         const doc = new jsPDF();
-        
+
         const tableColumns = [
-          { header: 'Nombres', dataKey: 'nombres' },
-          { header: 'Apellidos', dataKey: 'apellidos' },
-          { header: 'Fecha de nacimiento', dataKey: 'fecha_nacimiento' },
-          { header: 'Telefono', dataKey: 'telefono' },
-          { header: 'Correo', dataKey: 'correo_electronico' },
-          { header: 'Ciudad', dataKey: 'ciudad' },
+            { header: 'Nombres', dataKey: 'nombres' },
+            { header: 'Apellidos', dataKey: 'apellidos' },
+            { header: 'Fecha de nacimiento', dataKey: 'fecha_nacimiento' },
+            { header: 'Telefono', dataKey: 'telefono' },
+            { header: 'Correo', dataKey: 'correo_electronico' },
+            { header: 'Ciudad', dataKey: 'ciudad' },
         ];
-      
+
         const tableData = pacientes.map(pacientes => ({
             nombres: pacientes.nombres,
             apellidos: pacientes.apellidos,
@@ -424,21 +444,21 @@ const Pacientes = () => {
             correo_electronico: pacientes.correo_electronico,
             ciudad: pacientes.ciudad
         }));
-      
+
         doc.autoTable(tableColumns, tableData, {
-          startY: 60,
-          margin: { top: 10 },
+            startY: 60,
+            margin: { top: 10 },
         });
-      
+
         const tableHeader = tableColumns.map(column => column.header);
         const tableRows = tableData.map(data => tableColumns.map(column => data[column.dataKey]));
-      
+
         const worksheet = XLSX.utils.aoa_to_sheet([tableHeader, ...tableRows]);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Pacientes');
-      
+
         const excelFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      
+
         // Descargar el archivo Excel
         const excelBlob = new Blob([excelFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const excelLink = document.createElement('a');
@@ -447,7 +467,7 @@ const Pacientes = () => {
         excelLink.click();
     }
 
-    
+
 
     return (
         <div className="grid crud-demo">
@@ -480,23 +500,26 @@ const Pacientes = () => {
                         <Column field="sexo" header="Sexo" sortable body={sexoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="telefono" header="Telefono" sortable body={telefonoBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="correo" header="Correo" body={correoElectronicoBodyTemplate} sortable></Column>
-                        
+
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={pacienteUpdateDialog} style={{ width: '450px' }} header="Actualizar Paciente" modal className="p-fluid" footer={pacienteUpdateDialogFooter} onHide={hideDialog}>
-                        <div className="field">
-                            <label htmlFor="nombresPaciente">Nombres del paciente</label>
-                            <InputText id="nombres" name="nombres" value={paciente.nombres} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.nombres })} />
-                            {submitted && !paciente.nombres && <small className="p-invalid">Los nombres son requeridos.</small>}
+                    <Dialog visible={pacienteUpdateDialog} style={{ width: 'auto' }} header="Actualizar Paciente" modal className="p-fluid" footer={pacienteUpdateDialogFooter} onHide={hideDialog}>
+                        <div className="grid">
+                            <div className="col-12 md:col-6">
+                                <div className="field">
+                                    <label htmlFor="nombresPaciente">Nombres del paciente</label>
+                                    <InputText id="nombres" name="nombres" value={paciente.nombres} onChange={onInputChange} required autoFocus />
 
-                        </div>
+                                </div>
+                            </div>
+                            <div className="col-12 md:col-6">
+                                <div className="field">
+                                    <label htmlFor="apellidosPaciente">Apellidos del paciente</label>
+                                    <InputText id="apellidos" name="apellidos" value={paciente.apellidos} onChange={onInputChange} required autoFocus />
 
-                        <div className="field">
-                            <label htmlFor="apellidosPaciente">Apellidos del paciente</label>
-                            <InputText id="apellidos" name="apellidos" value={paciente.apellidos} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.apellidos })} />
-                            {submitted && !paciente.apellidos && <small className="p-invalid">Los apellidos son requeridos.</small>}
-
+                                </div>
+                            </div>
                         </div>
 
                         <div className="field">
@@ -510,52 +533,84 @@ const Pacientes = () => {
                                 dateFormat="yy/mm/dd"
                                 required
                                 autoFocus
-                                className={classNames({ 'p-invalid': submitted && !paciente.fecha_nacimiento })}
                             />
-                            {submitted && !paciente.fecha_nacimiento && (
-                                <small className="p-invalid">La fecha de nacimiento es requerida.</small>
-                            )}
                         </div>
-
-                        
-
                         <div className="field">
                             <label htmlFor="sexo">Genero del paciente</label>
-                            <InputText id="sexo" name="sexo" value={paciente.sexo} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.sexo })} />
-                            {submitted && !paciente.sexo && <small className="p-invalid">El sexo es requerido.</small>}
+                            <Dropdown id="categoria" value={paciente.sexo} onChange={(e) => setPaciente({ ...paciente, sexo: e.target.value })} options={sexoDropdown} placeholder="Seleccione un genero" />
 
                         </div>
 
-                        <div className="field">
-                            <label htmlFor="telefono">Telefono del paciente</label>
-                            <InputText id="telefono" name="telefono" value={paciente.telefono} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.telefono })} />
-                            {submitted && !paciente.telefono && <small className="p-invalid">El telefono es requerido.</small>}
+                        <div className="grid">
+                            <div className="col-12 md:col-6">
+                                <div className="field">
+                                    <label htmlFor="ci">Documento de identidad</label>
+                                    <InputNumber id="ci" name="ci" value={paciente.ci} onChange={onInputChange} required autoFocus useGrouping={false} />
 
+                                </div>
+                            </div>
+                            <div className="col-12 md:col-6">
+                                <div className="field">
+                                    <label htmlFor="telefono">Telefono del paciente</label>
+                                    <InputNumber id="telefono" name="telefono" value={paciente.telefono} onValueChange={onInputChange} useGrouping={false} />
+
+                                </div>
+                            </div>
                         </div>
 
                         <div className="field">
                             <label htmlFor="correo_electronico">Correo electronico del paciente</label>
-                            <InputText id="correo_electronico" name="correo_electronico" value={paciente.correo_electronico} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.correo_electronico })} />
-                            {submitted && !paciente.correo_electronico && <small className="p-invalid">El correo electronico es requerido.</small>}
+                            <InputText id="correo_electronico" name="correo_electronico" value={paciente.correo_electronico} onChange={onInputChange} required autoFocus />
 
                         </div>
 
                         <div className="field">
                             <label htmlFor="direccion">Direccion</label>
-                            <ListBox value={listboxValue} onChange={(e) => setListboxValue(e.value)} filterPlaceholder='Buscar direccion' options={direccion} optionLabel="direccion" filter />
+                            <div className="grid">
+                                <div className="col-12 md:col-6">
+                                    <div className="field">
+                                        <label htmlFor="pais">Pais</label>
+                                        <InputText id="pais" name="pais" value={pais} onChange={(e) => setPais(e.target.value)} disabled />
+                                    </div>
+                                </div>
+                                <div className="col-12 md:col-6">
+                                    <div className="field">
+                                        <label htmlFor="ciudad">Departamento</label>
+                                        <InputText id="ciudad" name="ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="grid">
+                                <div className="col-12 md:col-4">
+                                    <div className="field">
+                                        <label htmlFor="provincia">Provincia</label>
+                                        <Dropdown id="categoria" value={paciente.provincia} onChange={(e) => setPaciente({ ...paciente, provincia: e.target.value })} options={provinciasDropdown} placeholder="Seleccione una provincia" filter />
+                                    </div>
+                                </div>
+                                <div className="col-12 md:col-4">
+                                    <div className="field">
+                                        <label htmlFor="zona">Zona</label>
+                                        <InputText id="zona" name="zona" value={paciente.zona} onChange={(e) => setPaciente({ ...paciente, zona: e.target.value })} placeholder="Escriba la zona del paciente" />
+                                    </div>
+                                </div>
+                                <div className="col-12 md:col-4">
+                                    <div className="field">
+                                        <label htmlFor="calle">Calle</label>
+                                        <InputText id="calle" name="calle" value={paciente.calle} onChange={(e) => setPaciente({ ...paciente, calle: e.target.value })} placeholder="Escriba la calle donde vive el paciente" />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="field">
-                            <label htmlFor="usuario">Usuario</label>
-                            <InputText id="usuario" name="usuario" value={paciente.usuario} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.usuario })} />
-                            {submitted && !paciente.usuario && <small className="p-invalid">El usuario es requerido.</small>}
+                            <label htmlFor="usuario" className='font-bold'>Usuario:</label>
+                            <label className='ml-2'>{paciente.usuario}</label>
 
                         </div>
 
                         <div className="field">
-                            <label htmlFor="contrasenia">Contraseña</label>
-                            <InputText id="contrasenia" name="contrasenia" value={paciente.contrasenia} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !paciente.contrasenia })} />
-                            {submitted && !paciente.contrasenia && <small className="p-invalid">La contrasenia es requerida.</small>}
+                            <label htmlFor="contrasenia" className='font-bold'>Contraseña:</label>
+                            <label className='ml-2'>{paciente.contrasenia}</label>
 
                         </div>
                     </Dialog>
@@ -580,11 +635,11 @@ const Pacientes = () => {
 
 
                     <Dialog visible={serviceDialogExportar} style={{ width: '450px' }} header="Exportar" modal className="p-fluid" onHide={hideDialogExportar}>
-                        
+
                         <div className="field" style={{ display: 'flex', gap: '10px' }}>
                             <label htmlFor="formato">En que formato quiere el reporte</label>
                         </div>
-                        
+
                         <div className="field" style={{ display: 'flex', gap: '10px' }}>
                             <Button label="Exportar en EXCEL" icon="pi pi-upload" severity="success" onClick={exportToExcel} />
                             <Button label="Exportar en PDF" icon="pi pi-upload" severity="danger" onClick={exportToPDF} />

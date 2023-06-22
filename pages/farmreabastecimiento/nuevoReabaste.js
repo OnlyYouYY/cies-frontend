@@ -6,61 +6,42 @@ import { InputNumber } from 'primereact/inputnumber';
 import { Toast } from 'primereact/toast';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
-import { listarProveedores,registrar} from '../../services/apiReabastecimiento';
-import { useRouter } from 'next/router';
-import { getSession } from '../../utils/session';
-import { decryptData } from '../../services/crypto';
+import { listarProveedores, listarProductos, registrar } from '../../services/apiReabastecimiento';
 
 export const NuevoReabastecimiento = () => {
-
-    const session = getSession();
-    const router = useRouter();
-
-    const rolesPermitidos = ['administrador', 'farmaceutico'];
-
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            const rolUsuarioEncriptado = localStorage.getItem('userRole');
-            if (session == null || rolUsuarioEncriptado == null) {
-                router.replace('/pages/notfound');
-                return;
-            }
-            const rolUsuario = decryptData(rolUsuarioEncriptado);
-            if (!rolesPermitidos.includes(rolUsuario)) {
-                router.replace('/pages/notfound');
-                return;
-            }
-        }
-    });
-
     let emptyRestock = {
-        pedido_producto: '',
         cantidad_reabastecida: 0,
-        fecha_reabastecimiento: '',
+        fecha_reabastecimiento: null,
         costo_total: 0
     };
 
     const toast = useRef(null);
-    const fileUploadRef = useRef(null);
+
+    const [productos, setProductos] = useState([]);
+    const [producto, setProducto] = useState([]);
+    const [productosDropdown, setProductosDropdown] = useState([]);
 
     const [proveedores, setProveedores] = useState([]);
+    const [proveedor, setProveedor] = useState([]);
+    const [proveedoresDropdown, setProveedoresDropdown] = useState([]);
+
     const [reabastecimiento, setReabastecimiento] = useState(emptyRestock);
-    const [listboxValue, setListboxValue] = useState(null);
     const [submitted, setSubmitted] = useState(false);
 
     async function registrarReabastecimiento() {
-        if (reabastecimiento.pedido_producto != '' &&
-            listboxValue.id_proveedor != null &&
+        if (producto &&
+            proveedor != null &&
             reabastecimiento.cantidad_reabastecida > 0 &&
-            reabastecimiento.fecha_reabastecimiento != "" &&
+            reabastecimiento.fecha_reabastecimiento !== "" &&
             reabastecimiento.costo_total > 0
-            ) { 
+        ) {
             try {
-                const response = await registrar(reabastecimiento.cantidad_reabastecida, listboxValue.id_proveedor, reabastecimiento.cantidad_reabastecida.reabastecimiento.fecha_reabastecimiento, reabastecimiento.costo_total);
+                const response = await registrar(producto, proveedor, reabastecimiento.cantidad_reabastecida, formatDate(reabastecimiento.fecha_reabastecimiento), reabastecimiento.costo_total);
                 console.log(response);
                 toast.current.show({ severity: 'success', summary: 'Exitoso', detail: '¡Agregado!', life: 3000 });
                 setReabastecimiento(emptyRestock);
-                setListboxValue(null);
+                setProducto(null);
+                setProveedor(null);
             } catch (error) {
                 console.log(error);
             }
@@ -70,10 +51,38 @@ export const NuevoReabastecimiento = () => {
     }
 
     useEffect(() => {
+        async function obtenerproductos() {
+            try {
+                const produc = await listarProductos();
+                console.log(produc)
+                setProductos(produc);
+
+                const productosdropdown = produc.map(productos => ({
+                    label: productos.nombre_medicamento,
+                    value: productos.id_medicamento
+                }));
+                console.log(productosdropdown);
+                setProductosDropdown(productosdropdown);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        obtenerproductos();
+    }, []);
+
+    useEffect(() => {
         async function obtenerproveedores() {
             try {
                 const categorias = await listarProveedores();
+                console.log(categorias);
                 setProveedores(categorias);
+
+                const proveedordropdown = categorias.map(proveedor => ({
+                    label: proveedor.nombre_proveedor,
+                    value: proveedor.id_proveedor
+                }));
+                console.log(proveedordropdown);
+                setProveedoresDropdown(proveedordropdown);
             } catch (error) {
                 console.log(error);
             }
@@ -100,46 +109,51 @@ export const NuevoReabastecimiento = () => {
         }));
     };
 
-    const onInputNumberChangeI = (e) => {
-        const { name, value } = e.target;
-        setReabastecimiento(prevRestock => ({
-            ...prevRestock,
-            [name]: parseInt(value)
-        }));
-    };
-
     const onDateChange = (e) => {
         setReabastecimiento(prevRestock => ({
             ...prevRestock,
             fecha_reabastecimiento: e.value
         }));
     };
+    const getDefaultDate = () => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    };
+
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
 
     return (
         <div className="grid">
             <Toast ref={toast}></Toast>
             <div className="col-12 md:col-12">
                 <div className="card p-fluid">
-                    <h5>Nuevo Registro de Reabastecimiento</h5>
+                    <h3>Nuevo Registro de Reabastecimiento</h3>
                     <div className="field">
-                        <label htmlFor="pedido_producto">Nombre Pedido del Producto</label>
-                        <InputText id="pedido_producto" name="pedido_producto" value={reabastecimiento.pedido_producto} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': reabastecimiento.pedido_producto })} />
-                        {submitted && !reabastecimiento.pedido_producto && <small className="p-invalid">El nombre del priducto pedido es requerido.</small>}
+                        <label htmlFor="productos">Productos Disponibles</label>
+                        <Dropdown id='producto_id' value={producto} onChange={(e) => setProducto(e.value)} options={productosDropdown} placeholder='Seleccione un Producto' filterPlaceholder='Buscar Producto' filter />
                     </div>
 
                     <div className="field">
-                        <label htmlFor="id_proveedor">Proveedor Disponibles</label>
-                        <Dropdown value={listboxValue} onChange={(e) => setListboxValue(e.value)} filterPlaceholder='Buscar proveedor' options={proveedores} optionLabel="nombre_proveedor" filter />
+                        <label htmlFor="proveedor">Proveedores Disponibles</label>
+                        <Dropdown id='proveedor_id' value={proveedor} onChange={(e) => setProveedor(e.value)} options={proveedoresDropdown} placeholder='Seleccione un Proveedor' filterPlaceholder='Buscar Proveedor' filter />
                     </div>
 
                     <div className="field">
                         <label htmlFor="cantidad">Cantidad Pedida</label>
-                        <InputNumber id="cantidad" value={reabastecimiento.cantidad_reabastecida} name='cantidad' onValueChange={onInputNumberChangeI}/>
+                        <InputNumber id="cantidad_reabastecida" value={reabastecimiento.cantidad_reabastecida} name='cantidad_reabastecida' onValueChange={onInputNumberChange} />
                     </div>
 
-                    <div className="field" col>
+                    <div className="field">
                         <label htmlFor="fecha_pedido">Fecha del Pedido</label>
-                        <Calendar id="fecha_pedido" name="fecha_pedido" value={reabastecimiento.fecha_reabastecimiento} onChange={onDateChange} showIcon />
+                        <Calendar id="fecha_pedido" name="fecha_pedido" value={reabastecimiento.fecha_reabastecimiento} onChange={onDateChange} dateFormat="yy-mm-dd" placeholder={getDefaultDate()} showIcon />
                     </div>
 
                     <div className="field">
@@ -148,17 +162,27 @@ export const NuevoReabastecimiento = () => {
                     </div>
 
                     <div className="field">
-                        <span className="p-buttonset flex">
+                        <div className="card flex flex-wrap justify-content-end gap-3">
                             <Button
-                                label="Guardar"
-                                icon="pi pi-check"
+                                label="Registrar"
+                                className="p-mt-3 bg-orange-500"
+                                style={{ width: 'auto' }}
                                 onClick={handleSubmit}
+                                disabled={!setReabastecimiento}
                             />
-                            <Button label="Limpiar" icon="pi pi-times" onClick={() => {
-                                setReabastecimiento(emptyRestock);
-                                setListboxValue(null);
-                            }} />
-                        </span>
+                            <Button
+                                icon="pi pi-refresh"
+                                className="p-button-outlined p-button-danger p-mt-3"
+                                style={{ width: 'auto' }}
+                                onClick={() => {
+                                    setReabastecimiento(emptyRestock);
+                                    setProducto(null);
+                                    setProveedor(null);
+                                }}
+                                label="Limpiar"
+                            />
+                        </div>
+
                     </div>
                 </div>
             </div>

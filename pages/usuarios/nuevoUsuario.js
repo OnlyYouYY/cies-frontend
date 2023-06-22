@@ -5,7 +5,9 @@ import { addUsuarios, filtrarUsuarios } from "../../services/apiUsuarios";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import { useRouter } from 'next/router';
+import { register } from '../../services/api';
 import { getSession } from '../../utils/session';
+import { Password } from 'primereact/password';
 import { decryptData } from '../../services/crypto';
 
 const AgregarUsuario = () => {
@@ -30,211 +32,208 @@ const AgregarUsuario = () => {
     }
   });
 
-  const [usuario, setUsuario] = useState({
-    nombres: "",
-    apellidos: "",
-    correo: "",
-    contrasenia: "",
-    rol: "",
-  });
-  const [rol, setDropdownItem] = useState("");
-  const dropdownItems = [
-    { name: "Administrador", value: "administrador" },
-    { name: "Recepcionista", value: "recepcionista" },
-    { name: "Medico", value: "medico" },
-    { name: "Farmaceutico", value: "farmaceutico" },
-  ];
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMensaje, setErrorMensaje] = useState("");
   const toast = useRef(null);
+  const [nombres, setNombres] = useState('');
+  const [apellidos, setApellidos] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [contrasenia, setContrasenia] = useState('');
+  const [confirmContrasenia, setConfirmContrasenia] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    if (submitted) {
-      registrarUsuario();
+
+  const [rol, setDropdownItem] = useState('');
+  const dropdownItems = [
+    { name: 'Administrador', value: 'administrador' },
+    { name: 'Recepcionista', value: 'recepcionista' },
+    { name: 'Medico', value: 'medico' },
+    { name: 'Farmaceutico', value: 'farmaceutico' }
+  ];
+
+
+  const handlePasswordChange = (event) => {
+    setContrasenia(event.target.value);
+  };
+
+  const handleConfirmPasswordChange = (event) => {
+    setConfirmContrasenia(event.target.value);
+  };
+
+  const validatePassword = (password) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+    return regex.test(password);
+  };
+
+  const capitalizeWords = (str) => str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+
+
+  const handleNameChange = (event) => {
+    if (event.target.value.match(/^[a-zA-Z ]*$/)) {
+      setNombres(capitalizeWords(event.target.value));
     }
-  }, [submitted]);
+  }
 
-  const validarUsuarioExistente = async (correo, contrasenia) => {
-    try {
-      const usuarios = await filtrarUsuarios("", correo);
-      const usuarioExistente = usuarios.find(
-        (usuario) =>
-          usuario.correo.toLowerCase() === correo.toLowerCase() &&
-          usuario.contrasenia === contrasenia
-      );
-      return usuarioExistente;
-    } catch (error) {
-      throw error;
+  const handleLastNameChange = (event) => {
+    if (event.target.value.match(/^[a-zA-Z ]*$/)) {
+      setApellidos(capitalizeWords(event.target.value));
+    }
+  }
+
+  const handlePasswordBlur = () => {
+    if (confirmContrasenia && contrasenia !== confirmContrasenia) {
+      toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
+    } else if (confirmContrasenia && contrasenia === confirmContrasenia) {
+      toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Las contraseñas coinciden', life: 3000 });
     }
   };
 
-  const registrarUsuario = async () => {
-    try {
-      const usuarioExistente = await validarUsuarioExistente(
-        usuario.correo,
-        usuario.contrasenia
-      );
-      if (usuarioExistente) {
-        setErrorMensaje(
-          "Ya existe un usuario con el mismo correo y contraseña"
-        );
-        return;
-      }
-
-      const response = await addUsuarios(
-        usuario.nombres,
-        usuario.apellidos,
-        usuario.correo,
-        usuario.contrasenia,
-        rol
-      );
-      console.log(response);
-      if (toast.current) {
-        toast.current.show({
-          severity: "success",
-          summary: "Exitoso",
-          detail: "Usuario creado exitoso",
-          life: 3000,
-        });
-      }
-      setUsuario({
-        nombres: "",
-        apellidos: "",
-        correo: "",
-        contrasenia: "",
-        rol: "",
-      });
-      setErrorMensaje("");
-      setError(false);
-      setSubmitted(false); // Se agrega esta línea para habilitar el envío de nuevos usuarios
-    } catch (error) {
-      console.log(error);
-      toast.current?.show?.({
-        severity: "error",
-        summary: "Error",
-        detail: "No se pudo crear el usuario",
-        life: 3000,
-      });
-      setError(true);
-      setSubmitted(false);
-    }
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const usuarioExistente = await validarUsuarioExistente(
-      usuario.correo,
-      usuario.contrasenia
-    );
-    if (usuarioExistente) {
-      setErrorMensaje("Ya existe un usuario con el mismo correo y contraseña");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!nombres || !apellidos || !correo || !contrasenia || !rol) {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor completa todos los campos', life: 3000 });
       return;
     }
-    setErrorMensaje("");
-    setSubmitted(true);
+
+    if (!validatePassword(contrasenia)) {
+      toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'La contraseña debe tener al menos una letra minúscula, una mayúscula, un número y mínimo 6 caracteres.', life: 3000 });
+      return;
+    }
+
+    if (contrasenia !== confirmContrasenia) {
+      toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
+      return;
+    }
+
+    let estadoMedico;
+    if (rol === 'medico') {
+      estadoMedico = 'No registrado';
+    } else {
+      estadoMedico = 'Otro';
+    }
+
+    try {
+      const response = await register(nombres, apellidos, correo, contrasenia, rol, estadoMedico);
+      console.log(response);
+      toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Usuario registrado', life: 3000 });
+      setNombres('');
+      setApellidos('');
+      setCorreo('');
+      setContrasenia('');
+      setConfirmContrasenia('');
+      setDropdownItem('');
+
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: error.response.data, life: 3000 });
+      } else {
+        console.log(error);
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos incorrectos', life: 3000 });
+      }
+    }
   };
 
-  const onInputChange = (e) => {
-    const { name, value } = e.target;
-    setUsuario((prevUsuario) => ({
-      ...prevUsuario,
-      [name]: value,
-    }));
-  };
+  async function limpiarCampos() {
+    setNombres('');
+    setApellidos('');
+    setCorreo('');
+    setContrasenia('');
+    setConfirmContrasenia('');
+    setDropdownItem('');
+  }
 
-  const limpiarCampos = () => {
-    setUsuario({
-      nombres: "",
-      apellidos: "",
-      correo: "",
-      contrasenia: "",
-      rol: "",
-    });
-    setError(false);
-    setErrorMensaje("");
-  };
 
   return (
-    <div className="card">
-      <h2>Agregar Nuevo Usuario</h2>
-      <h5>Ingrese los siguientes datos</h5>
-      <br />
-      <form onSubmit={onSubmit}>
-        <div className="field">
-          <label htmlFor="nombres">Nombre</label>
-          <InputText
-            id="nombres"
-            name="nombres"
-            value={usuario.nombres}
-            onChange={onInputChange}
-            required
-            style={{ width: "100%" }}
-          />
+    <div className="grid">
+      <Toast ref={toast} />
+      <div className="col-12 md:col-12">
+        <div className="card p-fluid">
+          <h5>Registrar paciente nuevo</h5>
+          <form>
+            <div className="grid">
+              <div className="col-12 md:col-4">
+                <div className="field">
+                  <label htmlFor="nombres" className="block text-900 text-xl font-medium mb-2">
+                    Nombres
+                  </label>
+                  <InputText
+                    inputid="nombres1"
+                    value={nombres}
+                    onChange={handleNameChange}
+                    type="text"
+                    placeholder="Nombres"
+                    style={{ padding: '1rem' }}
+                  />
+                </div>
+              </div>
+              <div className="col-12 md:col-4">
+                <div className="field">
+                  <label htmlFor="apellidos" className="block text-900 text-xl font-medium mb-2">
+                    Apellidos
+                  </label>
+                  <InputText
+                    inputid="apellidos1"
+                    value={apellidos}
+                    onChange={handleLastNameChange}
+                    type="text"
+                    placeholder="Apellidos"
+                    style={{ padding: '1rem' }}
+                  />
+                </div>
+              </div>
+              <div className="col-12 md:col-4">
+                <div className="field">
+                  <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
+                    Correo electronico
+                  </label>
+                  <InputText inputid="email1" value={correo} onChange={(event) => setCorreo(event.target.value)} type="email" placeholder="Correo electronico" style={{ padding: '1rem' }}></InputText>
+                </div>
+              </div>
+              <div className="col-12 md:col-4">
+                <div className="field">
+                  <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
+                    Contraseña
+                  </label>
+                  <Password inputid="password1" value={contrasenia} onChange={handlePasswordChange} placeholder="Contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={18}></Password>
+                </div>
+              </div>
+              <div className="col-12 md:col-4">
+                <div className="field">
+                  <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
+                    Confirmar contraseña
+                  </label>
+                  <Password inputid="confirmpassword1" value={confirmContrasenia} onChange={handleConfirmPasswordChange} onBlur={handlePasswordBlur} placeholder="Confirmar contraseña" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" maxLength={18}></Password>
+                </div>
+              </div>
+              <div className="col-12 md:col-4">
+                <div className="field">
+                  <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
+                    Tipo de acceso
+                  </label>
+                  <Dropdown id="state" value={rol} onChange={(event) => setDropdownItem(event.value)} options={dropdownItems} optionLabel="name" placeholder="Seleccionar" className="w-full md:w-30rem mb-5"></Dropdown>
+                </div>
+              </div>
+            </div>
+            <div className="card flex flex-wrap justify-content-end gap-3">
+              <Button
+                label="Registrar"
+                onClick={handleSubmit}
+                className="p-mt-3 bg-orange-500"
+                type="submit"
+                style={{ width: 'auto' }}
+              />
+              <Button
+                icon="pi pi-refresh"
+                className="p-button-outlined p-button-danger p-mt-3"
+                style={{ width: 'auto' }}
+                onClick={limpiarCampos}
+                label="Limpiar"
+              />
+            </div>
+          </form>
+
         </div>
-        <div className="field">
-          <label htmlFor="apellidos">Apellido</label>
-          <InputText
-            id="apellidos"
-            name="apellidos"
-            value={usuario.apellidos}
-            onChange={onInputChange}
-            required
-            style={{ width: "100%" }}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="correo">Correo electrónico</label>
-          <InputText
-            id="correo"
-            name="correo"
-            value={usuario.correo}
-            onChange={onInputChange}
-            required
-            style={{ width: "100%" }}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="contrasenia">Contraseña</label>
-          <InputText
-            id="contrasenia"
-            name="contrasenia"
-            value={usuario.contrasenia}
-            onChange={onInputChange}
-            required
-            type="password"
-            style={{ width: "100%" }}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="rol">Rol</label>
-          <Dropdown
-            id="state"
-            value={rol}
-            onChange={(event) => setDropdownItem(event.target.value)}
-            options={dropdownItems}
-            optionLabel="name"
-            placeholder="Seleccionar"
-            className="w-full md:w-30rem mb-5"
-          ></Dropdown>
-        </div>
-        <div>
-          <Button label="Guardar" icon="pi pi-check" type="submit" />
-          <Button
-            label="Cancelar"
-            icon="pi pi-times"
-            onClick={limpiarCampos}
-            className="p-button-secondary"
-          />
-        </div>
-      </form>
-      {errorMensaje && (
-        <div className="error-message">
-          <span>{errorMensaje}</span>
-        </div>
-      )}
-      <Toast ref={toast} position="bottom-right" />
+      </div>
     </div>
+
   );
 };
 

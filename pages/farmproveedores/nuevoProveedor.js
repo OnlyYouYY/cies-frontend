@@ -3,36 +3,14 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { listarProveedores,registrar} from '../../services/apiProveedores';
-import { useRouter } from 'next/router';
-import { getSession } from '../../utils/session';
-import { decryptData } from '../../services/crypto';
 
 
 export const NuevoProveedor = () => {
-
-    const session = getSession();
-    const router = useRouter();
-
-    const rolesPermitidos = ['administrador', 'farmaceutico'];
-
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            const rolUsuarioEncriptado = localStorage.getItem('userRole');
-            if (session == null || rolUsuarioEncriptado == null) {
-                router.replace('/pages/notfound');
-                return;
-            }
-            const rolUsuario = decryptData(rolUsuarioEncriptado);
-            if (!rolesPermitidos.includes(rolUsuario)) {
-                router.replace('/pages/notfound');
-                return;
-            }
-        }
-    });
-
     let emptyService = {
         nombre_proveedor: '',
         representante: '',
@@ -43,9 +21,32 @@ export const NuevoProveedor = () => {
     const toast = useRef(null);
     const fileUploadRef = useRef(null);
 
+    const [proveedor, setProveedor] = useState([]);
     const [proveedores, setProveedores] = useState(emptyService);
     const [telefono, setTelefono] = useState('');
     const [submitted, setSubmitted] = useState(false);
+
+    const cargarProveedores = async () => {
+        try {
+            const provee = await listarProveedores();
+            setProveedor(provee);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    useEffect(()=>{
+        async function listarproveedo() {
+            try {
+                const prov = await listarProveedores();
+                console.log(prov);
+                setProveedor(prov);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        listarproveedo();
+    },[]);
+
 
     //registrar nuevo proveedor
     async function registrarProveedor() {
@@ -57,14 +58,15 @@ export const NuevoProveedor = () => {
                 const response = await registrar(proveedores.nombre_proveedor,proveedores.representante,telefono,proveedores.descripcion);
                 console.log(response);
                 toast.current.show({severity: 'success', summary: 'Exitoso', detail: 'Proveedor agregado', life: 3000});
-                setTelefono(null);
                 setProveedores(emptyService);
+                setTelefono("");
+                await cargarProveedores();
                 fileUploadRef.current.clear();
             } catch (error) {
                 console.log(error);
             }
         }else{
-            toast.current.show({ severity: 'warning', summary: 'Error', detail: 'Complete todos los campos', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Complete todos los campos', life: 3000 });
         }
     }
 
@@ -92,9 +94,9 @@ export const NuevoProveedor = () => {
     return (
         <div className='grid'>
             <Toast ref={toast}></Toast>
-            <div className='col-12 md:col-12'>
+            <div className='col-12 md:col-6'>
                 <div className='card p-fluid'>
-                    <h5>Nuevo Proveedor</h5>
+                    <h3>Nuevo Proveedor</h3>
                     <div className='field'>
                         <label htmlFor='nombreProveedor'>Nombre del Proveedor</label>
                         <InputText id='nombre_proveedor' name='nombre_proveedor' value={proveedores.nombre_proveedor} onChange={onInputChange} required autoFocus className={classNames({'p-invalid' : submitted && !proveedores.nombre_proveedor})}/>
@@ -129,19 +131,39 @@ export const NuevoProveedor = () => {
                     </div>
 
                     <div className="field">
-                        <label htmlFor="imagen">Opciones</label>
-                        <span className="p-buttonset flex">
+                        
+                        <div className="card flex flex-wrap justify-content-end gap-3">
                             <Button
-                                label="Guardar"
-                                icon="pi pi-check"
+                                label="Registrar"
+                                className="p-mt-3 bg-orange-500"
+                                style={{ width: 'auto' }}
                                 onClick={handleSubmit}
                                 disabled={!setProveedores}
                             />
-                            <Button label="Limpiar" icon="pi pi-times" onClick={() => {
-                                setProveedores(emptyService);
-                            }} />
-                        </span>
+                            <Button
+                                icon="pi pi-refresh"
+                                className="p-button-outlined p-button-danger p-mt-3"
+                                style={{ width: 'auto' }}
+                                onClick={() => {
+                                    setProveedores(emptyService);
+                                    setTelefono("");
+                                }}
+                                label="Limpiar"
+                            />
+                        </div>
                     </div>
+                </div>
+            </div>
+            <div className="col-12 md:col-6">
+                <div className="card p-fluid">
+                    <h5>Proveedores Disponibles</h5>
+                    <DataTable value={proveedor} scrollable scrollHeight="650px" className="mt-3">
+                        <Column field="id_proveedor" header="ID" style={{ flexGrow: 1, flexBasis: '100px' }}></Column>
+                        <Column field="nombre_proveedor" header="Nombre Proveedor" style={{ flexGrow: 1, flexBasis: '160px' }} className="font-bold"></Column>
+                        <Column field="representante" header="Representante" style={{ flexGrow: 1, flexBasis: '160px' }}></Column>
+                        <Column field="telefono" header="Telefono" style={{ flexGrow: 1, flexBasis: '160px' }}></Column>
+                        <Column field="descripcion_proveedor" header="Descripcion" style={{ flexGrow: 1, flexBasis: '160px' }}></Column>
+                    </DataTable>
                 </div>
             </div>
         </div>

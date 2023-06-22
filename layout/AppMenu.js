@@ -27,8 +27,7 @@ const AppMenu = () => {
                     items: [
                         { label: 'Registro de paciente', icon: 'pi pi-fw pi-user-plus', to: '/pacientes/nuevoPaciente' },
                         { label: 'Actualizar pacientes', icon: 'pi pi-fw pi-pencil', to: '/pacientes/actualizarPaciente' },
-                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open', to: '/pacientes/historiaClinica' },
-                        { label: 'Estadisticas de pacientes', icon: 'pi pi-fw pi-file-o', to: '/estadisticas/indexEstadisticasPacientes' }
+                        { label: 'Historia Clinica', icon: 'pi pi-fw pi-folder-open', to: '/pacientes/historiaClinica' }
                     ]
                 },
                 {
@@ -38,9 +37,11 @@ const AppMenu = () => {
                             label: 'Gestion de Productos',
                             icon: 'pi pi-fw pi-heart-fill',
                             items: [
+                                { label: 'Nueva categoria', icon: 'pi pi-fw pi-plus', to: '/farmproductos/categoriasProductos/nuevaCategoria' },
                                 { label: 'Nuevo producto', icon: 'pi pi-fw pi-plus', to: '/farmproductos/nuevoProducto' },
                                 { label: 'Actualizar producto', icon: 'pi pi-fw pi-pencil', to: '/farmproductos' },
-                                { label: 'Listar productos', icon: 'pi pi-fw pi-list', to: '/farmproductos/listarProductos' }
+                                { label: 'Listar productos', icon: 'pi pi-fw pi-list', to: '/farmproductos/listarProductos' },
+                                
                             ]
                         },
                         {
@@ -94,7 +95,6 @@ const AppMenu = () => {
                         { label: 'Ver servicios', icon: 'pi pi-fw pi-list', to: '/servicios/listarCategorias' },
                         { label: 'Registro de fichas', icon: 'pi pi-fw pi-ticket', to: '/servicios/fichas/nuevaCita' },
                         { label: 'Listado de fichas', icon: 'pi pi-fw pi-search', to: '/servicios/fichas/listarFichas' },
-                        { label: 'Estadisticas de servicios', icon: 'pi pi-fw pi-file-o', to: '/estadisticas/indexEstadisticasServicios' }
                     ]
 
                 },
@@ -111,10 +111,9 @@ const AppMenu = () => {
                                 { label: 'Habilitar/Deshabilitar', icon: 'pi pi-fw pi-check', to: '/usuarios/habilitarCuentas' },
                             ]
                         },
-                        { label: 'Generar informes', icon: 'pi pi-fw pi-file-import' },
+                        { label: 'Generar informes', icon: 'pi pi-fw pi-file-import', to: '/informes/indexInformes' },
                         { label: 'Gestion de Medicos', icon: 'pi pi-fw pi-chart-bar', to: '/usuarios/registrarMedico' },
                         { label: 'Analitica de datos', icon: 'pi pi-fw pi-chart-bar', to: '/estadisticas/dashboard' },
-                        { label: 'Configuración del sistema', icon: 'pi pi-fw pi-cog' }
                     ]
                 }],
             medico: [
@@ -235,7 +234,7 @@ const AppMenu = () => {
         <MenuProvider>
             <ul className="layout-menu">
                 {model.map((item, i) => {
-                    return !item.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className="menu-separator"></li>;
+                    return !item.seperator ? <AppMenuitem item={item} root={true} index={i} key={item.label} /> : <li className="menu-separator" ></li>;
                 })}
             </ul>
         </MenuProvider>

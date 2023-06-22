@@ -271,9 +271,9 @@ export default function MedicoNuevo() {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" severity="success" rounded className="mr-2" onClick={() => dialogMedico(rowData)} disabled={estadoMedicoTag(rowData.estadoMedico) === 'success'} />
-                <Button icon="pi pi-calendar-plus" severity="info" rounded className="mr-2" onClick={() => dialogHorarios(rowData)} disabled={estadoMedicoTag(rowData.estadoMedico) === 'danger'} />
-                <Button icon="pi pi-trash" severity="warning" rounded onClick={() => confirmDeleteMedico(rowData)} />
+                <Button icon="pi pi-pencil" severity="info" rounded className="mr-2" onClick={() => dialogMedico(rowData)} disabled={estadoMedicoTag(rowData.estadoMedico) === 'success'} />
+                <Button icon="pi pi-calendar-plus" severity="success" rounded className="mr-2" onClick={() => dialogHorarios(rowData)} disabled={estadoMedicoTag(rowData.estadoMedico) === 'danger'} />
+                <Button icon="pi pi-times" severity="danger" rounded onClick={() => confirmDeleteMedico(rowData)} />
             </>
         );
     };

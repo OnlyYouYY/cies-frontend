@@ -238,8 +238,8 @@ const ActualizarCategoria = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" severity="success" rounded className="mr-2" onClick={() => editService(rowData)} />
-                <Button icon="pi pi-trash" severity="warning" rounded onClick={() => confirmDeleteCategory(rowData)} />
+                <Button icon="pi pi-pencil" severity="info" rounded className="mr-2" onClick={() => editService(rowData)} />
+                <Button icon="pi pi-times" severity="danger" rounded onClick={() => confirmDeleteCategory(rowData)} />
             </>
         );
     };
@@ -247,7 +247,7 @@ const ActualizarCategoria = () => {
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Gestion de Servicios</h5>
-            <Button label="Dar de baja" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedCategories || !selectedCategories.length} />
+            <Button visible={false} label="Dar de baja" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedCategories || !selectedCategories.length} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />

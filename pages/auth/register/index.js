@@ -45,6 +45,26 @@ const RegisterPage = () => {
         setConfirmContrasenia(event.target.value);
     };
 
+    const validatePassword = (password) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
+        return regex.test(password);
+    };
+
+    const capitalizeWords = (str) => str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+
+
+    const handleNameChange = (event) => {
+        if (event.target.value.match(/^[a-zA-Z ]*$/)) {
+            setNombres(capitalizeWords(event.target.value));
+        }
+    }
+
+    const handleLastNameChange = (event) => {
+        if (event.target.value.match(/^[a-zA-Z ]*$/)) {
+            setApellidos(capitalizeWords(event.target.value));
+        }
+    }
+
     const handlePasswordBlur = () => {
         if (confirmContrasenia && contrasenia !== confirmContrasenia) {
             toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
@@ -59,6 +79,12 @@ const RegisterPage = () => {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor completa todos los campos', life: 3000 });
             return;
         }
+
+        if (!validatePassword(contrasenia)) {
+            toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'La contraseña debe tener al menos una letra minúscula, una mayúscula, un número y mínimo 6 caracteres.', life: 3000 });
+            return;
+        }
+
         if (contrasenia !== confirmContrasenia) {
             toast.current.show({ severity: 'warn', summary: 'Verifica', detail: 'Las contraseñas no coinciden', life: 3000 });
             return;
@@ -80,8 +106,12 @@ const RegisterPage = () => {
             }
 
         } catch (error) {
-            console.log(error);
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos incorrectos', life: 3000 });
+            if (error.response && error.response.status === 400) {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: error.response.data, life: 3000 });
+            } else {
+                console.log(error);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Datos incorrectos', life: 3000 });
+            }
         }
     };
 
@@ -105,11 +135,27 @@ const RegisterPage = () => {
                             <label htmlFor="nombres" className="block text-900 text-xl font-medium mb-2">
                                 Nombres
                             </label>
-                            <InputText inputid="nombres1" value={nombres} onChange={(event) => setNombres(event.target.value)} type="text" placeholder="Nombres" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }}></InputText>
+                            <InputText
+                                inputid="nombres1"
+                                value={nombres}
+                                onChange={handleNameChange}
+                                type="text"
+                                placeholder="Nombres"
+                                className="w-full md:w-30rem mb-5"
+                                style={{ padding: '1rem' }}
+                            />
                             <label htmlFor="apellidos" className="block text-900 text-xl font-medium mb-2">
                                 Apellidos
                             </label>
-                            <InputText inputid="apellidos1" value={apellidos} onChange={(event) => setApellidos(event.target.value)} type="text" placeholder="Apellidos" className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }}></InputText>
+                            <InputText
+                                inputid="apellidos1"
+                                value={apellidos}
+                                onChange={handleLastNameChange}
+                                type="text"
+                                placeholder="Apellidos"
+                                className="w-full md:w-30rem mb-5"
+                                style={{ padding: '1rem' }}
+                            />
                             <label htmlFor="email1" className="block text-900 text-xl font-medium mb-2">
                                 Correo electronico
                             </label>
@@ -128,7 +174,7 @@ const RegisterPage = () => {
                             <Dropdown id="state" value={rol} onChange={(event) => setDropdownItem(event.value)} options={dropdownItems} optionLabel="name" placeholder="Seleccionar" className="w-full md:w-30rem mb-5"></Dropdown>
                             <Button label="Registrar" className="block w-full p-3 text-xl bg-orange-400" type='submit'></Button>
                             <div className="block text-center mb-5 mt-3">
-                                <span>Espera la confirmacion por correo electronico para acceder.</span>
+                                <span>Espera a que el administrador te brinde acceso al sistema.</span>
                             </div>
                         </form>
                         <Button icon="pi pi-arrow-left" className="block w-full" style={{ color: 'var(--primary-color)' }} label="Iniciar Sesion" text onClick={() => Router.push('/auth/login')} />

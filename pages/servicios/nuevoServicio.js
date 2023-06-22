@@ -182,7 +182,7 @@ export const NuevoServicio = () => {
                     <h5>Nuevo Servicio</h5>
                     <div className="field">
                         <label htmlFor="nombreServicio">Nombre del servicio</label>
-                        <InputText id="nombre_servicio" name="nombre_servicio" value={servicio.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !servicio.nombre_servicio })} />
+                        <InputText id="nombre_servicio" name="nombre_servicio" placeholder='Escriba el nombre del servicio' value={servicio.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !servicio.nombre_servicio })} />
                         {submitted && !servicio.nombre_servicio && <small className="p-invalid">El nombre es requerido.</small>}
 
                     </div>
@@ -209,23 +209,28 @@ export const NuevoServicio = () => {
                             customUpload
                             uploadHandler={handleFileUpload}
                         />
-
                     </div>
                     <div className="field">
-                        <label htmlFor="imagen">Opciones</label>
-                        <span className="p-buttonset flex">
+                        <div className="card flex flex-wrap justify-content-end gap-3">
                             <Button
-                                label="Guardar"
-                                icon="pi pi-check"
+                                label="Registrar"
+                                className="p-mt-3 bg-orange-500"
+                                style={{ width: 'auto' }}
                                 onClick={handleSubmit}
                                 disabled={!selectedImage || !setServicio}
                             />
-                            <Button label="Limpiar" icon="pi pi-times" onClick={() => {
-                                setServicio(emptyService);
-                                setListboxValue(null);
-                                setSelectedImage(null);
-                            }} />
-                        </span>
+                            <Button
+                                icon="pi pi-refresh"
+                                className="p-button-outlined p-button-danger p-mt-3"
+                                style={{ width: 'auto' }}
+                                onClick={() => {
+                                    setServicio(emptyService);
+                                    setListboxValue(null);
+                                    setSelectedImage(null);
+                                }}
+                                label="Limpiar"
+                            />
+                        </div>
                     </div>
 
                 </div>

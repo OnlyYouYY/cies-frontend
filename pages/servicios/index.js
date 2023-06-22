@@ -11,7 +11,7 @@ import { RadioButton } from 'primereact/radiobutton';
 import { Toast } from 'primereact/toast';
 import { Editor } from 'primereact/editor';
 import { Rating } from 'primereact/rating';
-import { listarCategorias, mostrarServicios, registrar, actualizar, eliminar, eliminarVarios } from '../../services/apiService';
+import { listarCategorias, mostrarServicios, habilitarServicio, actualizar, eliminar, eliminarVarios } from '../../services/apiService';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { use, useEffect, useRef, useState } from 'react';
@@ -30,7 +30,7 @@ const Servicios = () => {
 
     const rolesPermitidos = ['administrador'];
 
-    useEffect(()=>{
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const rolUsuarioEncriptado = localStorage.getItem('userRole');
             if (session == null || rolUsuarioEncriptado == null) {
@@ -53,6 +53,10 @@ const Servicios = () => {
         ruta_imagen: ''
     };
 
+    const fileUploadRef = useRef(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imageURL, setImageURL] = useState(null);
+    const [currentImage, setCurrentImage] = useState(null);
     const [serviceDialogExportar, setServiceDialogExportar] = useState(false);
     const [categorias, setCategorias] = useState([]);
     const [servicios, setServicios] = useState([]);
@@ -60,8 +64,10 @@ const Servicios = () => {
     const [serviceDialog, setServiceDialog] = useState(false);
     const [serviceUpdateDialog, setServiceUpdateDialog] = useState(false);
     const [deleteServiceDialog, setDeleteServiceDialog] = useState(false);
+    const [habilitarServiceDialog, setHabilitarServiceDialog] = useState(false);
     const [deleteServicesDialog, setDeleteServicesDialog] = useState(false);
     const [service, setService] = useState(emptyService);
+    const [descripcion_servicio, setDescripcion_servicio] = useState('');
     const [selectedServices, setSelectedServices] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState(null);
@@ -80,17 +86,28 @@ const Servicios = () => {
 
 
     async function actualizarServicio() {
-        try {
-            const response = await actualizar(service.id, service.nombre_servicio, service.descripcion_servicio, service.id_categoria);
-            console.log(response);
-            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio actualizado', life: 3000 });
-            await cargarServicios();
-            setServiceUpdateDialog(false);
-            setService(emptyService);
-        } catch (error) {
-            console.log(error);
+        if (service.nombre_servicio.trim() !== "" &&
+            service.descripcion_servicio.trim() !== "" &&
+            service.id_categoria != null &&
+            (selectedImage || currentImage)) {
+            try {
+                const imageToUpload = selectedImage !== currentImage ? selectedImage : null;
+                const response = await actualizar(service.id, service.nombre_servicio, descripcion_servicio, service.id_categoria, imageToUpload);
+                console.log(response);
+                console.log(selectedImage);
+                console.log(imageToUpload);
+                toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio actualizado', life: 3000 });
+                await cargarServicios();
+                setServiceUpdateDialog(false);
+                setService(emptyService);
+            } catch (error) {
+                console.log(error);
+            }
+        } else {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Complete todos los campos', life: 3000 });
         }
     }
+
 
     function onSubmitActualizar() {
         actualizarServicio();
@@ -109,6 +126,21 @@ const Servicios = () => {
             toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio eliminado', life: 3000 });
             await cargarServicios();
             setDeleteServiceDialog(false);
+            setService(emptyService);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    async function habilitarServicioID() {
+        try {
+
+            const response = await habilitarServicio(service.id);
+            console.log(response);
+            toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio habilitado', life: 3000 });
+            await cargarServicios();
+            setHabilitarServiceDialog(false);
             setService(emptyService);
         }
         catch (error) {
@@ -162,9 +194,17 @@ const Servicios = () => {
         listarServicios();
     }, []);
 
-    // const formatCurrency = (value) => {
-    //     return value.toLocaleString('es-BO', { style: 'currency', currency: 'BOB' });
-    // };
+    const handleFileUpload = (event) => {
+        console.log('Image selected');
+        const file = event.files[0];
+        setSelectedImage(file);
+        console.log(file);
+        setImageURL(null);
+        setImageURL(URL.createObjectURL(file));
+        fileUploadRef.current.clear();
+    };
+
+
 
     const renderHeader = () => {
         return (
@@ -209,6 +249,10 @@ const Servicios = () => {
         setDeleteServiceDialog(false);
     };
 
+    const hideHabilitarServiceDialog = () => {
+        setHabilitarServiceDialog(false);
+    };
+
     const hideDeleteServicesDialog = () => {
         setDeleteServicesDialog(false);
     };
@@ -217,12 +261,21 @@ const Servicios = () => {
     const editService = (service) => {
         setService({ ...service });
         console.log(service);
+        setDescripcion_servicio(service.descripcion_servicio);
         setServiceUpdateDialog(true);
+        setImageURL(null);
+        setCurrentImage(service.ruta_imagen);
+        console.log(currentImage);
     };
 
     const confirmDeleteService = (service) => {
         setService(service);
         setDeleteServiceDialog(true);
+    };
+
+    const confirmHabilitarService = (service) => {
+        setService(service);
+        setHabilitarServiceDialog(true);
     };
 
 
@@ -249,14 +302,6 @@ const Servicios = () => {
         }));
     };
 
-    const onInputNumberChange = (e) => {
-        const { name, value } = e.target;
-        setService(prevService => ({
-            ...prevService,
-            [name]: parseFloat(value)
-        }));
-    };
-
 
 
     const idBodyTemplate = (rowData) => {
@@ -276,8 +321,6 @@ const Servicios = () => {
             </>
         );
     };
-
-
 
     const categoriaBodyTemplate = (rowData) => {
         return (
@@ -318,8 +361,9 @@ const Servicios = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" severity="success" rounded className="mr-2" onClick={() => editService(rowData)} />
-                <Button icon="pi pi-trash" severity="warning" rounded onClick={() => confirmDeleteService(rowData)} />
+                <Button icon="pi pi-pencil" severity="info" rounded className="mr-2" onClick={() => editService(rowData)} />
+                <Button icon="pi pi-check" severity="success" rounded className="mr-2" onClick={() => confirmHabilitarService(rowData)} />
+                <Button icon="pi pi-times" severity="danger" rounded onClick={() => confirmDeleteService(rowData)} />
             </>
         );
     };
@@ -327,8 +371,8 @@ const Servicios = () => {
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 className="m-0">Gestion de Servicios</h5>
-            <Button label="Dar de baja" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
-            <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
+            <Button visible={false} label="Dar de baja" icon="pi pi-times" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedServices || !selectedServices.length} />
+            <Button visible={false} label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -342,6 +386,12 @@ const Servicios = () => {
         <>
             <Button label="Cancelar" icon="pi pi-times" text onClick={hideDialog} />
             <Button label="Guardar" icon="pi pi-check" text onClick={onSubmitActualizar} />
+        </>
+    );
+    const habilitarServiceDialogFooter = (
+        <>
+            <Button label="No" icon="pi pi-times" text onClick={hideHabilitarServiceDialog} />
+            <Button label="Si" icon="pi pi-check" text onClick={habilitarServicioID} />
         </>
     );
     const deleteServiceDialogFooter = (
@@ -373,18 +423,18 @@ const Servicios = () => {
 
             // Párrafo introductorio
             const introText = 'A continuación se presenta un informe detallado de los servicios disponibles en nuestra aplicación. Estos servicios son utilizados por nuestros clientes para satisfacer sus necesidades en diferentes áreas. El informe incluye información relevante sobre cada servicio, como su nombre, descripción, precio, categoría y fecha de creación. Esperamos que este informe sea útil para comprender mejor nuestra oferta de servicios.';
-        
+
             const splitIntroText = doc.splitTextToSize(introText, doc.internal.pageSize.getWidth() - 20);
             doc.setFontSize(12);
             doc.text(splitIntroText, 10, 20);
-            
+
             const startY = doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 60;
 
             const tableColumns = [
-                { header: 'Codigo', dataKey: 'codigo'},
+                { header: 'Codigo', dataKey: 'codigo' },
                 { header: 'Nombre', dataKey: 'nombre_servicio' },
                 { header: 'Categoria', dataKey: 'nombre_categoria' },
-                { header: 'Estado', dataKey:'estado_servicio' },
+                { header: 'Estado', dataKey: 'estado_servicio' },
                 { header: 'Fecha creacion', dataKey: 'fecha_creacion' },
             ];
 
@@ -414,15 +464,15 @@ const Servicios = () => {
             return;
         } else {
             const doc = new jsPDF();
-        
+
             const tableColumns = [
-                { header: 'Codigo', dataKey: 'codigo'},
+                { header: 'Codigo', dataKey: 'codigo' },
                 { header: 'Nombre', dataKey: 'nombre_servicio' },
                 { header: 'Categoria', dataKey: 'nombre_categoria' },
-                { header: 'Estado', dataKey:'estado_servicio' },
+                { header: 'Estado', dataKey: 'estado_servicio' },
                 { header: 'Fecha creacion', dataKey: 'fecha_creacion' },
             ];
-            
+
             const tableData = servicios.map(servicio => ({
                 codigo: servicio.codigo,
                 nombre_servicio: servicio.nombre_servicio,
@@ -430,21 +480,21 @@ const Servicios = () => {
                 estado_servicio: servicio.estado_servicio,
                 fecha_creacion: formatDate(servicio.fecha_creacion)
             }));
-            
+
             doc.autoTable(tableColumns, tableData, {
                 startY: 60,
                 margin: { top: 10 },
             });
-            
+
             const tableHeader = tableColumns.map(column => column.header);
             const tableRows = tableData.map(data => tableColumns.map(column => data[column.dataKey]));
-            
+
             const worksheet = XLSX.utils.aoa_to_sheet([tableHeader, ...tableRows]);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Servicios');
-            
+
             const excelFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            
+
             // Descargar el archivo Excel
             const excelBlob = new Blob([excelFile], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const excelLink = document.createElement('a');
@@ -491,12 +541,11 @@ const Servicios = () => {
                     <Dialog visible={serviceUpdateDialog} style={{ width: '450px' }} header="Actualizar Servicio" modal className="p-fluid" footer={serviceUpdateDialogFooter} onHide={hideDialog}>
                         <div className="field">
                             <label htmlFor="nombre_servicio">Nombre del servicio</label>
-                            <InputText id="nombre_servicio" name="nombre_servicio" value={service.nombre_servicio} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !service.nombre_servicio })} />
-                            {submitted && !service.nombre_servicio && <small className="p-invalid">El nombre es requerido.</small>}
+                            <InputText id="nombre_servicio" name="nombre_servicio" value={service.nombre_servicio} onChange={(e) => setService({ ...service, nombre_servicio: e.target.value })} />
                         </div>
                         <div className="field">
-                            <label htmlFor="description">Descripcion</label>
-                            <Editor id="descripcion_servicio" name="descripcion_servicio" value={service.descripcion_servicio} onTextChange={(e) => setService({ ...service, descripcion_servicio: e.htmlValue })} headerTemplate={headerEditor} style={{ height: '200px' }} />
+                            <label htmlFor="descripcion_servicio">Descripcion</label>
+                            <Editor id="descripcion_servicio" name="descripcion_servicio" value={descripcion_servicio} onTextChange={(e) => setDescripcion_servicio(e.htmlValue)} headerTemplate={headerEditor} style={{ height: '200px' }} />
                         </div>
 
                         <div className="field">
@@ -519,13 +568,35 @@ const Servicios = () => {
                             </div>
                         </div>
 
-                        <div className="card">
-                            <h5>Imagen servicio</h5>
+                        <div className="field">
+                            <label>Imagen servicio</label>
                             <div className="flex justify-content-center">
-                                <Image id="ruta_imagen" name="ruta_imagen" src={`${service.ruta_imagen}`} alt="galleria" width={250} preview />
+                                <Image id="ruta_imagen" name="ruta_imagen" src={imageURL || service.ruta_imagen} alt="galleria" width={400} preview />
                             </div>
+                            <div className="mt-2 flex justify-content-end">
+                                <FileUpload
+                                    ref={fileUploadRef}
+                                    mode="basic"
+                                    chooseLabel="Actualizar imagen"
+                                    customUpload
+                                    auto
+                                    uploadHandler={handleFileUpload}
+                                />
+                            </div>
+
                         </div>
 
+                    </Dialog>
+
+                    <Dialog visible={habilitarServiceDialog} style={{ width: '450px' }} header="Confirmar" modal footer={habilitarServiceDialogFooter} onHide={hideHabilitarServiceDialog}>
+                        <div className="flex align-items-center justify-content-center">
+                            <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
+                            {service && (
+                                <span>
+                                    Desea habilitar el siguiente servicio: <b>{service.nombre_servicio}</b>?
+                                </span>
+                            )}
+                        </div>
                     </Dialog>
 
                     <Dialog visible={deleteServiceDialog} style={{ width: '450px' }} header="Confirmar" modal footer={deleteServiceDialogFooter} onHide={hideDeleteServiceDialog}>
@@ -547,11 +618,11 @@ const Servicios = () => {
                     </Dialog>
 
                     <Dialog visible={serviceDialogExportar} style={{ width: '450px' }} header="Exportar" modal className="p-fluid" onHide={hideDialogExportar}>
-                        
+
                         <div className="field" style={{ display: 'flex', gap: '10px' }}>
                             <label htmlFor="formato">En que formato quiere el reporte</label>
                         </div>
-                        
+
                         <div className="field" style={{ display: 'flex', gap: '10px' }}>
                             <Button label="Exportar en EXCEL" icon="pi pi-upload" severity="success" onClick={exportToExcel} />
                             <Button label="Exportar en PDF" icon="pi pi-upload" severity="danger" onClick={exportToPDF} />

@@ -187,19 +187,26 @@ export const NuevoServicio = () => {
 
                     </div>
                     <div className="field">
-                        <label htmlFor="imagen">Opciones</label>
-                        <span className="p-buttonset flex">
+                        <div className="card flex flex-wrap justify-content-end gap-3">
                             <Button
-                                label="Guardar"
-                                icon="pi pi-check"
+                                label="Registrar"
+                                className="p-mt-3 bg-orange-500"
+                                style={{ width: 'auto' }}
                                 onClick={handleSubmitCategory}
                                 disabled={!selectedImageCategory || !setCategoria}
                             />
-                            <Button label="Limpiar" icon="pi pi-times" onClick={() => {
-                                setCategoria(emptyCategory);
-                                setSelectedImageCategory(null);
-                            }} />
-                        </span>
+                            <Button
+                                icon="pi pi-refresh"
+                                className="p-button-outlined p-button-danger p-mt-3"
+                                style={{ width: 'auto' }}
+                                onClick={() => {
+                                    setCategoria(emptyCategory);
+                                    setSelectedImageCategory(null);
+                                }}
+                                label="Limpiar"
+                            />
+                        </div>
+
                     </div>
 
                 </div>

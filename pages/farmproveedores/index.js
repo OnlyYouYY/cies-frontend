@@ -12,39 +12,15 @@ import React, { use, useEffect, useRef, useState } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { useRouter } from 'next/router';
-import { getSession } from '../../utils/session';
-import { decryptData } from '../../services/crypto';
+import { InputNumber } from 'primereact/inputnumber';
 
 const Proveedores = () => {
-
-    const session = getSession();
-    const router = useRouter();
-
-    const rolesPermitidos = ['administrador', 'farmaceutico'];
-
-    useEffect(()=>{
-        if (typeof window !== 'undefined') {
-            const rolUsuarioEncriptado = localStorage.getItem('userRole');
-            if (session == null || rolUsuarioEncriptado == null) {
-                router.replace('/pages/notfound');
-                return;
-            }
-            const rolUsuario = decryptData(rolUsuarioEncriptado);
-            if (!rolesPermitidos.includes(rolUsuario)) {
-                router.replace('/pages/notfound');
-                return;
-            }
-        }
-    });
-
-
     let emptyService = {
         id_proveedor: 0,
         nombre_proveedor: '',
         representante:'',
         telefono:'',
-        descripcion: '',
+        descripcion_proveedor: '',
     };
 
     const [proveedores, setProveedores] = useState([]); //[servicios, setServicios]
@@ -73,7 +49,7 @@ const Proveedores = () => {
 
     async function actualizarProveedor() {
         try {
-            const response = await actualizar(supplier.id_proveedor,supplier.nombre_proveedor,supplier.representante,supplier.telefono,supplier.descripcion);
+            const response = await actualizar(supplier.id_proveedor,supplier.nombre_proveedor,supplier.representante,supplier.telefono,supplier.descripcion_proveedor);
             console.log(response);
             toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Servicio actualizado', life: 3000 })
             await cargarProveedores();
@@ -222,8 +198,8 @@ const Proveedores = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <>
-                <Button icon="pi pi-pencil" severity="success" rounded className="mr-2" onClick={() => editSupplier(rowData)} />
-                <Button icon="pi pi-trash" severity="warning" rounded onClick={() => confirmDeleteSupplier(rowData)} />
+                <Button icon="pi pi-pencil" severity="info" rounded className="mr-2" onClick={() => editSupplier(rowData)} />
+                <Button icon="pi pi-times" severity="danger" rounded onClick={() => confirmDeleteSupplier(rowData)} />
             </>
         );
     };
@@ -237,9 +213,9 @@ const Proveedores = () => {
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Gestion de Proveedores</h5>
-            <Button label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedSuppliers || !selectedSuppliers.length} />
-            <Button label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
+            <h3 className="m-0">Gestion y Atualizacion de Proveedores</h3>
+            <Button visible={false} label="Eliminar" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedSuppliers || !selectedSuppliers.length} />
+            <Button visible={false} label="Exportar" icon="pi pi-upload" severity="help" onClick={openNewExportar} />
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onChange={(e) => setGlobalFilter(e.target.value)} placeholder="Buscar nombre..." />
@@ -388,11 +364,11 @@ const Proveedores = () => {
                         <Column field="nombre_proveedor" header="Nombre Proveedor" sortable body={nombreBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="representante" header="Representante" body={representanteBodyTemplate} sortable></Column>
                         <Column field="telefono" header="Telefono" sortable body={telefonoBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
-                        <Column field="descripcion" header="Descripcion" body={descripcionBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
+                        <Column field="descripcion_proveedor" header="Descripcion" body={descripcionBodyTemplate} sortable headerStyle={{ minWidth: '10rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={supplierUpdateDialog} style={{ width: '450px' }} header="Actualizar Proveedor" modal className="p-fluid" footer={supplierUpdateDialogFooter} onHide={hideDialog}>
+                    <Dialog visible={supplierUpdateDialog} style={{ width: '450px' }} header="Editar Proveedor" modal className="p-fluid" footer={supplierUpdateDialogFooter} onHide={hideDialog}>
                         <div className="field">
                             <label htmlFor="nombre_proveedor">Nombre del Proveedor</label>
                             <InputText id="nombre_proveedor" name="nombre_proveedor" value={supplier.nombre_proveedor} onChange={onInputChange} required autoFocus className={classNames({ 'p-invalid': submitted && !supplier.nombre_proveedor })} />
@@ -400,29 +376,27 @@ const Proveedores = () => {
                         </div>
                         <div className='field'>
                             <label htmlFor='Representante'>Representante del Proveedor</label>
-                            <InputText id='representante' name='representante' value={supplier.representante} onChange={onInputChange} required outoFocus className={classNames({'p-invalid' : submitted && !supplier.representante})}/>
+                            <InputText id='representante' name='representante' value={supplier.representante} onChange={onInputChange} required autoFocus className={classNames({'p-invalid' : submitted && !supplier.representante})}/>
                             {submitted && !supplier.representante && <small className='p-invalid'>Nombre del Representante del Proveedor, requerido.</small>}
                         </div>
 
                         <div className='field'>
                             <label htmlFor='telefono'>Telefono de la Proveedora</label>
-                            <InputText
+                            <InputNumber
                                 id='telefono'
                                 name='telefono'
-                                value={telefono}
-                                onChange={handleTelefonoChange}
+                                value={supplier.telefono}
+                                onValueChange={(e) => setSupplier({ ...supplier, telefono: e.target.value })}
                                 required
                                 autoFocus
-                                className={classNames({ 'p-invalid': submitted && !telefono })}
+                                useGrouping={false}
+                                maxLength={8}
                             />
-                            {submitted && !telefono && (
-                            <small className='p-invalid'>Numero Telefonico, requerido.</small>
-                            )}
                         </div>
 
                         <div className="field">
-                            <label htmlFor="description">Descripcion</label>
-                            <InputTextarea id="descripcion" name="descripcion" value={supplier.descripcion} onChange={onInputChange} required rows={3} cols={20} />
+                            <label htmlFor="descripcion_proveedor">Descripcion</label>
+                            <InputTextarea id="descripcion_proveedor" name="descripcion_proveedor" value={supplier.descripcion_proveedor} onChange={onInputChange} required rows={3} cols={20} />
                         </div>
                     </Dialog>
 

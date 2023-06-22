@@ -14,19 +14,24 @@
     box-shadow: 0px 3px 5px rgba(0, 0, 0, .02), 0px 0px 2px rgba(0, 0, 0, .05), 0px 1px 4px rgba(0, 0, 0, .08);
 }
 
+
+
 .layout-menu {
     margin: 0;
     padding: 0;
     list-style-type: none;
     user-select: none;
+    
 
     .layout-root-menuitem {
+        
         >.layout-menuitem-root-text {
             font-size: .857rem;
             text-transform: uppercase;
             font-weight: 700;
             color: var(--surface-900);
             margin: .75rem 0;
+            
         }
 
         > a {
@@ -35,13 +40,17 @@
     }
 
     li.active-menuitem {
+        
         > a {
+            
             .layout-submenu-toggler {
                 transform: rotate(-180deg);
+
             }
         }
 
         > ul {
+            
             max-height: auto;
         }
     }
@@ -70,6 +79,7 @@
                 font-size: 75%;
                 margin-left: auto;
                 transition: transform $transitionDuration;
+                
             }
 
             &.rotated-icon {
@@ -79,12 +89,14 @@
             }
 
             &.active-route {
+                background-color: #FF7800;
                 font-weight: 700;
-                color: var(--primary-color);
+                color: var(--primary-color-text);
             }
 
             &:hover {
-                background-color: var(--surface-hover);
+                background-color: #FF7800;
+                color: #fff;
             }
 
             &:focus {
@@ -139,10 +151,12 @@
 .layout-submenu-enter-active {
     max-height: 1000px !important;
     transition: max-height 1s ease-in-out;
+    
 }
 
 .layout-submenu-enter-done {
     max-height: 1000px !important;
+    
 }
 
 .layout-submenu-exit {

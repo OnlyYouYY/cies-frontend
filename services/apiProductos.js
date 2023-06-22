@@ -1,9 +1,23 @@
 import axios from 'axios';
+
 const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
+
+
 //listara todos los producto que estas con estado 1 o activo o true
 export async function listarProductos(){
     try {
         const response = await axios.get(`${BASE_URL}/productos/`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+//listara todos los productos que no esten disponibles o eliminados
+export async function listarNoProductos(){
+    try {
+        const response = await axios.get(`${BASE_URL}/productos/no`);
         return response.data;
     }
     catch(error){
@@ -34,9 +48,9 @@ export async function listarProveedores(){
 }
 
 //lo que hara es registrar nuevos productos con sus datos correcpondientes
-export async function registrar(nombre_medicamento, proveedor_id ,categoria_id, precio_unitario, cantidad, fecha_caducidad) {
+export async function registrar(nombre_medicamento,proveedor_id,categoria_id,precio_unitario,cantidad,fecha_caducidad) {
     try {
-        const response = await axios.post(`${BASE_URL}/productos/registrar`, {nombre_medicamento, proveedor_id ,categoria_id, precio_unitario, cantidad, fecha_caducidad});
+        const response = await axios.post(`${BASE_URL}/productos/registrar`, {nombre_medicamento,proveedor_id,categoria_id,precio_unitario,cantidad,fecha_caducidad});
         return response.data;
     }
     catch(error){
@@ -45,9 +59,9 @@ export async function registrar(nombre_medicamento, proveedor_id ,categoria_id, 
 }
 
 //se registrar nueva categoria para productos
-export async function registrarCategoria(nombre_categoria) {
+export async function registrarCategoria(nombre_categoria, descripcion) {
     try {
-        const response = await axios.post(`${BASE_URL}/productos/registrarcategoria`, {nombre_categoria});
+        const response = await axios.post(`${BASE_URL}/productos/registrarcategoria`, {nombre_categoria, descripcion});
         return response.data;
     }
     catch(error){
@@ -82,6 +96,28 @@ export async function eliminar(id_medicamento){
 export async function eliminarVarios(ids){
     try {
         const response = await axios.put(`${BASE_URL}/productos/eliminarProductos`,{ids});
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+//retornara o cambiara el estado de inactivo a activo de un producto en especifico 
+export async function retornar(id_medicamento){
+    try {
+        const response = await axios.put(`${BASE_URL}/productos/regresar/${id_medicamento}`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+//retornara o cambiara el estado de inactivo a activo de varios productos
+export async function retornarVarios(ids){
+    try {
+        const response = await axios.put(`${BASE_URL}/productos/regresarProductos`,{ids});
         return response.data;
     }
     catch(error){

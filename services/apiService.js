@@ -41,16 +41,29 @@ export async function registrarCategoria(nombre_categoria, descripcion_categoria
     }
 }
 
-export async function actualizar(id, nombre_servicio, descripcion_servicio, id_categoria) {
+export async function actualizar(id, nombre_servicio, descripcion_servicio, id_categoria, imagen) {
     try {
-        const response = await axios.put(`${BASE_URL}/servicios/actualizar/${id}`, { nombre_servicio, descripcion_servicio, id_categoria });
+        const formData = new FormData();
+        formData.append('nombre_servicio', nombre_servicio);
+        formData.append('descripcion_servicio', descripcion_servicio);
+        formData.append('id_categoria', id_categoria);
+        if (imagen) {
+            formData.append('imagen', imagen);
+        }
+
+        const response = await axios.put(`${BASE_URL}/servicios/actualizar/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     }
     catch (error) {
         throw error;
     }
-
 }
+
+
 
 export async function eliminar(id) {
     try {
@@ -134,6 +147,16 @@ export async function actualizarCategoria(id, nombre_categoria, descripcion_cate
         throw error;
     }
 
+}
+
+export async function habilitarServicio(id) {
+    try {
+        const response = await axios.put(`${BASE_URL}/servicios/estadoHabilitado/${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
 }
 
 export async function eliminarCategoria(id) {

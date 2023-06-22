@@ -38,6 +38,25 @@ export async function actualizar(id, nombres, apellidos, correo, contrasenia, ro
     }
 }
 
+export async function actualizarFotoPerfil(id, imagen) {
+    try {
+        const formData = new FormData();
+        if (imagen) {
+            formData.append('imagen', imagen);
+        }
+
+        const response = await axios.put(`${BASE_URL}/usuarios/actualizarImagenPerfil/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
 export async function actualizarEstadoHabilitado(id) {
     try {
         const response = await axios.put(`${BASE_URL}/usuarios/estadoHabilitado/${id}`);
@@ -120,14 +139,12 @@ export async function getMedicoID(id_usuario) {
     }
   }
 
-export async function updateUsuario(id, nombres, apellidos, correo, contrasenia, rol) {
+export async function updateUsuario(id, nombres, apellidos, correo) {
     try {
         const response = await axios.put(`${BASE_URL}/usuarios/actualizar/${id}`, {
             nombres,
             apellidos,
-            correo,
-            contrasenia,
-            rol
+            correo
         });
         return response.data;
     } catch (error) {

@@ -167,7 +167,7 @@ const Usuarios = () => {
       <Button
         label="Guardar"
         icon="pi pi-check"
-        className="p-button-primary"
+        className="p-button-primary bg-orange-500"
         onClick={guardarCambios}
       />
     </div>
@@ -195,11 +195,11 @@ const Usuarios = () => {
             <div>
               <Button
                 icon="pi pi-pencil"
-                className="p-button-rounded p-button-success p-mr-2"
+                className="p-button-rounded p-button-success p-mr-2 mr-3"
                 onClick={() => editarUsuario(rowData)}
               />
               <Button
-                icon="pi pi-trash"
+                icon="pi pi-times"
                 className="p-button-rounded p-button-danger"
                 onClick={() => eliminarUsuario(rowData.id)}
               />

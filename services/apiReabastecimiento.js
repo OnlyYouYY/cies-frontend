@@ -1,31 +1,19 @@
 import axios from 'axios';
 
 const BASE_URL = 'https://app-84d299d1-f2c1-4453-b186-40061aa20a53.cleverapps.io/api';
-
-export async function registrar(pedido_producto, id_proveedor, cantidad_reabastecida, fecha_reabastecimiento, numero_factura, costo_total) {
+export async function registrar(producto_id, proveedor_id, cantidad_reabastecida, fecha_reabastecimiento, costo_total) {
     try {
-        const formData = new FormData();
-        formData.append('pedido_producto', pedido_producto);
-        formData.append('id_proveedor', id_proveedor);
-        formData.append('cantidad_reabastecida', cantidad_reabastecida);
-        formData.append('fecha_reabastecimiento', fecha_reabastecimiento);
-        formData.append('costo_total', costo_total);
         //formData.append('imagen', imagen); //crea folder es especifico -> para lo que quiero productos 
-
-        const response = await axios.post(`${BASE_URL}/reabastecer/registrar`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
+        const response = await axios.post(`${BASE_URL}/reabastecer/registrar`, {producto_id, proveedor_id, cantidad_reabastecida, fecha_reabastecimiento, costo_total});
         return response.data;
     }
     catch (error) {
         throw error;
     }
 }
-export async function actualizar(id_reabastecimiento, pedido_producto,id_proveedor, cantidad_reabastecida, fecha_reabastecimiento , costo_total) {
+export async function actualizar(id_reabastecimiento, producto_id,proveedor_id, cantidad_reabastecida, fecha_reabastecimiento , costo_total) {
     try {
-        const response = await axios.put(`${BASE_URL}/reabastecer/actualizar/${id_reabastecimiento}`, { pedido_producto,id_proveedor, cantidad_reabastecida, fecha_reabastecimiento , costo_total });
+        const response = await axios.put(`${BASE_URL}/reabastecer/actualizar/${id_reabastecimiento}`, { producto_id,proveedor_id, cantidad_reabastecida, fecha_reabastecimiento , costo_total });
         return response.data;
     }
     catch (error) {
@@ -46,7 +34,27 @@ export async function eliminar(id_reabastecimiento) {
 
 export async function eliminarVarios(ids) {
     try {
-        const response = await axios.put(`${BASE_URL}/reabastecer/eliminarVarios`, { ids });
+        const response = await axios.put(`${BASE_URL}/reabastecer/eliminarVarios`, {ids});
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function retornar(id) {
+    try {
+        const response = await axios.put(`${BASE_URL}/reabastecer/regresar/${id}`);
+        return response.data;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function retornarVarios(ids) {
+    try {
+        const response = await axios.put(`${BASE_URL}/reabastecer/regresarVarios`, {ids});
         return response.data;
     }
     catch (error) {
@@ -64,9 +72,28 @@ export async function listarProveedores(){
     }
 }
 
+export async function listarProductos(){
+    try {
+        const response = await axios.get(`${BASE_URL}/reabastecer/productos`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
 export async function listarReabasteci(){
     try {
         const response = await axios.get(`${BASE_URL}/reabastecer/`);
+        return response.data;
+    }
+    catch(error){
+        throw error;
+    }
+}
+export async function listarNoReabasteci(){
+    try {
+        const response = await axios.get(`${BASE_URL}/reabastecer/no`);
         return response.data;
     }
     catch(error){

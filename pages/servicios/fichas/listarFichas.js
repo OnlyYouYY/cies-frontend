@@ -37,6 +37,8 @@ export default function FrozenColumnsDemo() {
         }
     });
 
+    let today = new Date();
+
     const [fecha, setFecha] = useState(obtenerFechaActual);
     const [fichas, setFichas] = useState([]);
     const [ficha, setFicha] = useState(null);
@@ -139,7 +141,7 @@ export default function FrozenColumnsDemo() {
     };
 
     const actionBodyTemplate = (rowData) => {
-        return <Button type="button" icon="pi pi-trash" rounded onClick={() => confirmDeleteFicha(rowData)}></Button>;
+        return <Button type="button" icon="pi pi-trash" severity='danger' rounded onClick={() => confirmDeleteFicha(rowData)} disabled={fichaEstado(rowData.estado_ficha) === 'success' || fichaEstado(rowData.estado_ficha) === 'danger'}></Button>;
     };
 
     const estadoTemplate = (rowData) => {
@@ -151,7 +153,7 @@ export default function FrozenColumnsDemo() {
             <h5 className="m-0">Fichas reservadas</h5>
 
             <span className="block mt-2 md:mt-0">
-                <Calendar value={fecha} onChange={(e) => { setFecha(e.value); }} showIcon dateFormat="yy-mm-dd" placeholder='Buscar fecha...' />
+                <Calendar value={fecha} onChange={(e) => { setFecha(e.value); }} maxDate={today} required autoFocus showIcon dateFormat="yy-mm-dd" placeholder='Buscar fecha...' />
             </span>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />

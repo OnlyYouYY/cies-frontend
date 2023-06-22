@@ -111,7 +111,7 @@ const AppMenu = () => {
                                 { label: 'Habilitar/Deshabilitar', icon: 'pi pi-fw pi-check', to: '/usuarios/habilitarCuentas' },
                             ]
                         },
-                        { label: 'Generar informes', icon: 'pi pi-fw pi-file-import', to: '/informes/indexInformes' },
+                        { label: 'Generar informes', icon: 'pi pi-fw pi-file-import' },
                         { label: 'Gestion de Medicos', icon: 'pi pi-fw pi-chart-bar', to: '/usuarios/registrarMedico' },
                         { label: 'Analitica de datos', icon: 'pi pi-fw pi-chart-bar', to: '/estadisticas/dashboard' },
                     ]
